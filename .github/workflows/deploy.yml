@@ -37,6 +37,7 @@ jobs:
           SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
           NEXT_PUBLIC_SENTRY_DSN=${{ vars.NEXT_PUBLIC_SENTRY_DSN }}
           SERVER_SENTRY_DSN=${{ vars.SERVER_SENTRY_DSN }}
+          NEXTAUTH_URL=https://itadaki.app
           EOF
 
       - name: Build Docker image
