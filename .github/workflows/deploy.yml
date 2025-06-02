@@ -27,6 +27,9 @@ jobs:
           POSTGRES_DB=${{ vars.DB_NAME }}
           POSTGRES_USER=${{ vars.DB_USER }}
           POSTGRES_PASSWORD=${{ secrets.DB_PASSWORD }}
+          SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
+          NEXT_PUBLIC_SENTRY_DSN=${{ vars.NEXT_PUBLIC_SENTRY_DSN }}
+          SERVER_SENTRY_DSN=${{ vars.SERVER_SENTRY_DSN }}
           EOF
 
       - name: Build Docker image
