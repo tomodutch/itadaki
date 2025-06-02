@@ -1,36 +1,91 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Itadaki 🍽️
 
-## Getting Started
+**Itadaki** is a [Progressive Web App (PWA)](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps) for nutrition tracking. Users can search for foods via the OpenFoodFacts API, scan product barcodes using their device camera, and create their own custom food entries. Personalized macro and calorie goals help guide daily intake. Itadaki is optimized for both desktop and mobile and works offline thanks to service workers.
+
+---
+
+## 🔑 Key Features
+
+- 📦 **Search + Log Foods**: Search by name or barcode using OpenFoodFacts.
+- ✍️ **Add Custom Foods**: Store your own ingredients and nutritional data.
+- 🎯 **Set Nutrition Goals**: Daily calorie, protein, carb, and fat targets.
+- 📷 **Barcode Scanner**: Use your phone’s camera to scan food barcodes.
+- 📱 **Installable PWA**: Works offline, fast and responsive on any device.
+- 🔐 **Secure Auth**: Register and log in with NextAuth.
+- 🗃️ **Local State**: Manage UI state cleanly with Zustand.
+- 📖 **UI Components with Storybook**: Isolate and document reusable components.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Framework**: [Next.js](https://nextjs.org/) (SSR, SSG, PWA)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **API**: [GraphQL Yoga](https://the-guild.dev/graphql/yoga)
+- **Database**: [Prisma](https://www.prisma.io/) + [PostgreSQL](https://www.postgresql.org/)
+- **Authentication**: [NextAuth.js](https://next-auth.js.org/)
+- **State Management**: [Zustand](https://github.com/pmndrs/zustand)
+- **GraphQL Client**: [Apollo Client](https://www.apollographql.com/docs/react/)
+- **UI Library**: [shadcn/ui](https://ui.shadcn.com/)
+- **UI Components**: [React](https://react.dev) + [Storybook](https://storybook.js.org/)
+- **Deployment**: [Docker & Docker Compose](https://www.docker.com/)
+- **Data Source**: [OpenFoodFacts API](https://world.openfoodfacts.org/)
+
+---
+
+## 📦 Installation
+
+```bash
+git clone https://github.com/tomodutch/itadaki.git
+cd itadaki
+npm install
+```
+
+---
+
+## ⚙️ Getting Started
 
 First, run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser to see the app.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🧪 Storybook
 
-## Learn More
+Itadaki uses **Storybook** for developing UI components in isolation.
 
-To learn more about Next.js, take a look at the following resources:
+To start Storybook:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run storybook
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+View it at [http://localhost:6006](http://localhost:6006)
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🤝 Contributing
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Pull requests and contributions are welcome! If you’d like to add a feature, fix a bug, or improve the design:
+
+1. Fork the repo
+2. Create a new branch (`feat/my-feature`)
+3. Commit your changes
+4. Open a pull request
+
+### Code Style
+
+- Use TypeScript throughout
+- Prefer functional React components
+- Write and maintain stories for reusable components
+- Write tests when possible
+- Keep GraphQL resolvers typed and documented
+
+## 📄 License
+
+[GNU General Public License v3.0](COPYING)
