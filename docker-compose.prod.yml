@@ -1,8 +1,6 @@
 services:
   itadaki_web:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/${REPO_OWNER}/itadaki-web:latest
     expose:
       - "3000"           # expose to other containers, but no host binding
     depends_on:

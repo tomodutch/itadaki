@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   workflow_run:
-    workflows: ["Test"]
+    workflows: ["Build and Push"]
     types:
       - completed
 
@@ -10,17 +10,21 @@ jobs:
   cancel_previous_runs:
     runs-on: ubuntu-latest
     steps:
-      - name: Cancel Previous Workflow Runs
+      - name: Cancel Previous Runs
         uses: styfle/cancel-workflow-action@0.11.0
         with:
           access_token: ${{ secrets.GITHUB_TOKEN }}
+
   deploy:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: [self-hosted]
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Pull latest Docker image
+        run: docker pull ghcr.io/${{ github.repository_owner }}/itadaki-web:latest
 
       - name: Create .env file
         run: |
@@ -40,11 +44,11 @@ jobs:
           NEXTAUTH_URL=https://itadaki.app
           EOF
 
-      - name: Build Docker image
-        run: docker compose -f docker-compose.prod.yml build
+      - name: Set REPO_OWNER
+        run: echo "REPO_OWNER=${{ github.repository_owner }}" >> $GITHUB_ENV
 
-      - name: Start new containers
-        run: docker compose -f docker-compose.prod.yml up -d --build --remove-orphans
+      - name: Start containers using pulled image
+        run: docker compose --env-file .env -f docker-compose.prod.yml up -d --remove-orphans
 
-      - name: Clean up Docker
+      - name: Clean up unused Docker resources
         run: docker system prune -af
