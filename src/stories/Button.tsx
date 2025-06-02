@@ -1,4 +1,4 @@
-import './button.css';
+import { Button } from "@/components/ui/button"
 
 export interface ButtonProps {
   /** Is this the principal call to action on the page? */
@@ -14,7 +14,7 @@ export interface ButtonProps {
 }
 
 /** Primary UI component for user interaction */
-export const Button = ({
+export const MyButton = ({
   primary = false,
   size = 'medium',
   backgroundColor,
@@ -22,18 +22,5 @@ export const Button = ({
   ...props
 }: ButtonProps) => {
   const mode = primary ? 'storybook-button--primary' : 'storybook-button--secondary';
-  return (
-    <button
-      type="button"
-      className={['storybook-button', `storybook-button--${size}`, mode].join(' ')}
-      {...props}
-    >
-      {label}
-      <style jsx>{`
-        button {
-          background-color: ${backgroundColor};
-        }
-      `}</style>
-    </button>
-  );
+  return <Button variant={"secondary"} {...props}>{label}</Button>
 };
