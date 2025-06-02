@@ -7,8 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "vitest",
+    "test": "vitest --config=vitest.config.mts",
     "storybook": "storybook dev -p 6006",
+    "test-storybook": "vitest --config=./.storybook/vitest.setup.ts",
     "build-storybook": "storybook build"
   },
   "dependencies": {
