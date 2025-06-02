@@ -53,6 +53,19 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) in your browser to see the app.
 
+### Install github auth provider
+
+1. Go to [GitHub Developer Settings → OAuth Apps](https://github.com/settings/developers).
+2. Click **"New OAuth App"**.
+3. Fill in the following details:
+   - **Application name**: `Itadaki` (or any name you like)
+   - **Homepage URL**: `http://localhost:3000`
+   - **Authorization callback URL**: `http://localhost:3000/api/auth/callback/github`
+4. After creating the app, copy your **Client ID** and **Client Secret**.
+5. Add them to your environment variables:
+   ```env
+   GITHUB_ID=<your client ID>
+   GITHUB_SECRET=<your client secret>
 ---
 
 ## 🧪 Storybook

@@ -15,6 +15,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Create .env file
+        run: |
+          cat <<EOF > .env
+          GITHUB_ID=${{ secrets.NEXTHAUTH_GITHUB_ID }}
+          GITHUB_SECRET=${{ secrets.NEXTHAUTH_GITHUB_SECRET }}
+          NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}
+          DB_NAME=${{ vars.DB_NAME }}
+          DB_USER=${{ vars.DB_USER }}
+          DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+          POSTGRES_DB=${{ vars.DB_NAME }}
+          POSTGRES_USER=${{ vars.DB_USER }}
+          POSTGRES_PASSWORD=${{ secrets.DB_PASSWORD }}
+          EOF
+
       - name: Build Docker image
         run: docker compose -f docker-compose.prod.yml build
 

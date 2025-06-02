@@ -1,4 +1,4 @@
-import { MyButton } from './Button';
+import { Button } from '@/components/ui/button';
 import './header.css';
 
 type User = {
@@ -40,12 +40,12 @@ export const Header = ({ user, onLogin, onLogout, onCreateAccount }: HeaderProps
             <span className="welcome">
               Welcome, <b>{user.name}</b>!
             </span>
-            <MyButton size="small" onClick={onLogout} label="Log out" />
+            <Button size="sm" onClick={onLogout} name="Log out" role='button'/>log out<Button/>
           </>
         ) : (
           <>
-            <MyButton size="small" onClick={onLogin} label="Log in" />
-            <MyButton primary size="small" onClick={onCreateAccount} label="Sign up" />
+            <Button size="sm" onClick={onLogin} name='Log in' role='button' />Log in<Button/>
+            <Button variant="default" size="sm" onClick={onCreateAccount} role="button"/>Sign up<Button/>
           </>
         )}
       </div>
