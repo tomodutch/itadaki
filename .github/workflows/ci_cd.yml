@@ -107,6 +107,7 @@ jobs:
           SERVER_SENTRY_DSN=${{ vars.SERVER_SENTRY_DSN }}
           NEXTAUTH_URL=https://itadaki.app
           IMAGE_TAG=${{ github.sha }}
+          REPO_OWNER=${{ github.repository_owner }}
           EOF
 
       - name: "Pull latest Docker image by commit SHA tag"
