@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { LogIn, User, Nut, Apple, EggFried, Fish, Carrot, Salad, Cherry, Croissant } from "lucide-react";
 import Link from "next/link";
+import { UtensilsCrossed } from "lucide-react"
 
 const floatingFoods = [
     {
@@ -90,12 +91,12 @@ export default function Hero() {
 
             {/* Headline */}
             <motion.h1
-                className="text-4xl md:text-5xl font-extrabold text-gray-900"
+                className="text-4xl md:text-5xl font-extrabold text-gray-900 inline-flex items-center gap-2"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
             >
-                itadaki 🍽️
+                itadaki <UtensilsCrossed className="w-[1em] h-[1em]"  />
             </motion.h1>
 
             {/* Subtext */}
