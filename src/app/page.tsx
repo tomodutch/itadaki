@@ -14,3 +14,11 @@ export default function Home() {
     </main>
   );
 }
+
+export const metadata = {
+  title: {
+    template: "%s | itadaki",
+    default: "itadaki | Nutrition Tracking Made Easy",
+  },
+  description: "Track your meals effortlessly with itadaki. Get insights into your nutrition and make healthier choices.",
+}

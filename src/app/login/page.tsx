@@ -1,41 +1,40 @@
-"use client";
-
-import { LoginForm } from "@/components/login-form"
-import { SessionProvider } from "next-auth/react";
+import ClientLoginForm from "@/components/client-login-form";
 import Image from "next/image";
 
 
 import { GalleryVerticalEnd } from "lucide-react"
 export default function LoginPage() {
   return (
-    <SessionProvider>
-      <div className="grid min-h-svh lg:grid-cols-2">
-        <div className="flex flex-col gap-4 p-6 md:p-10">
-          <div className="flex justify-center gap-2 md:justify-start">
-            <a href="#" className="flex items-center gap-2 font-medium">
-              <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
-                <GalleryVerticalEnd className="size-4" />
-              </div>
-              itadaki
-            </a>
-          </div>
-          <div className="flex flex-1 items-center justify-center">
-            <div className="w-full max-w-xs">
-              <LoginForm />
+    <div className="grid min-h-svh lg:grid-cols-2">
+      <div className="flex flex-col gap-4 p-6 md:p-10">
+        <div className="flex justify-center gap-2 md:justify-start">
+          <a href="#" className="flex items-center gap-2 font-medium">
+            <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
+              <GalleryVerticalEnd className="size-4" />
             </div>
-          </div>
+            itadaki
+          </a>
         </div>
-        <div className="bg-muted relative hidden lg:block">
-          <Image
-            src="https://placecats.com/millie/640/800"
-            width={640}
-            height={800}
-            alt="Image"
-            className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-          />
+        <div className="flex flex-1 items-center justify-center">
+          <div className="w-full max-w-xs">
+            <ClientLoginForm />
+          </div>
         </div>
       </div>
-    </SessionProvider>
+      <div className="bg-muted relative hidden lg:block">
+        <Image
+          src="https://placecats.com/millie/640/800"
+          width={640}
+          height={800}
+          alt="Image"
+          className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+        />
+      </div>
+    </div>
   )
 }
 
+export const metadata = {
+  title: "Login | itadaki",
+  description: "Login to your account",
+}
