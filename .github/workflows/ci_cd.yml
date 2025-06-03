@@ -39,22 +39,52 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     needs: [test, cancel_previous_builds]
-    outputs:
-      image_digest: ${{ steps.push.outputs.image_digest }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2.8.0
+
       - name: Log in to GitHub Container Registry
-        run: echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        uses: docker/login-action@v2.8.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_PAT }}
 
       - name: Build and Push Docker Image
-        id: push
+        id: build_push
         run: |
-          docker build --no-cache -t ghcr.io/${{ github.repository_owner }}/itadaki-web:latest .
-          docker push ghcr.io/${{ github.repository_owner }}/itadaki-web:latest
-          IMAGE_DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/${{ github.repository_owner }}/itadaki-web:latest)
-          echo "image_digest=${IMAGE_DIGEST#*@}" >> $GITHUB_OUTPUT
+          IMAGE_TAG=${{ github.sha }}
+          docker buildx build --push --no-cache \
+            -t ghcr.io/${{ github.repository_owner }}/itadaki-web:${IMAGE_TAG} \
+            -t ghcr.io/${{ github.repository_owner }}/itadaki-web:latest .
+          echo "image_tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
+
+      - name: Save image tag to environment
+        run: echo "IMAGE_TAG=${{ steps.build_push.outputs.image_tag }}" >> $GITHUB_ENV
+
+      - name: "Clean up old Docker images (Retention policy: keep latest 5)"
+        env:
+          GHCR_PAT: ${{ secrets.GHCR_PAT }}
+          REPO: ${{ github.repository_owner }}/itadaki-web
+        run: |
+          echo "Cleaning up old Docker images..."
+
+          TAGS_TO_DELETE=$(gh api -H "Accept: application/vnd.github+json" \
+            /users/${{ github.repository_owner }}/packages/container/itadaki-web/versions \
+            --jq '.[] | {id: .id, created_at: .created_at, metadata: .metadata.container.tags[0]} | @json' | \
+            jq -s 'sort_by(.created_at) | reverse | .[5:] | .[].id')
+
+          if [ -n "$TAGS_TO_DELETE" ]; then
+            for ID in $TAGS_TO_DELETE; do
+              echo "Deleting package version ID: $ID"
+              gh api --method DELETE /user/packages/container/itadaki-web/versions/$ID
+            done
+          else
+            echo "No old images to delete"
+          fi
 
   deploy:
     if: github.ref == 'refs/heads/main'
@@ -80,13 +110,10 @@ jobs:
           NEXT_PUBLIC_SENTRY_DSN=${{ vars.NEXT_PUBLIC_SENTRY_DSN }}
           SERVER_SENTRY_DSN=${{ vars.SERVER_SENTRY_DSN }}
           NEXTAUTH_URL=https://itadaki.app
-          IMAGE_DIGEST=${{ needs.build_and_push.outputs.image_digest }}
+          IMAGE_TAG=${{ env.IMAGE_TAG }}
           EOF
 
-      - name: Set REPO_OWNER
-        run: echo "REPO_OWNER=${{ github.repository_owner }}" >> $GITHUB_ENV
-
-      - name: Pull latest Docker image
+      - name: Pull latest Docker image by commit SHA tag
         run: docker compose -f docker-compose.prod.yml pull itadaki_web
 
       - name: Start containers using pulled image

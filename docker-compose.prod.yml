@@ -1,6 +1,6 @@
 services:
   itadaki_web:
-    image: ghcr.io/${REPO_OWNER}/itadaki-web@${IMAGE_DIGEST}
+    image: ghcr.io/${REPO_OWNER}/itadaki-web:${IMAGE_TAG}
     expose:
       - "3000"           # expose to other containers, but no host binding
     depends_on:
