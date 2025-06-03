@@ -105,7 +105,7 @@ export function WeightChart(props: React.HTMLAttributes<HTMLDivElement>) {
         </div>
         <Select value={timeRange} onValueChange={setTimeRange}>
           <SelectTrigger
-            className="hidden w-[160px] rounded-lg sm:ml-auto sm:flex"
+            className="w-[160px] rounded-lg sm:ml-auto sm:flex"
             aria-label="Select time range"
           >
             <SelectValue placeholder="Last year" />
