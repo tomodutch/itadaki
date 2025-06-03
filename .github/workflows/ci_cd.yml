@@ -110,9 +110,8 @@ jobs:
           EOF
 
       - name: "Pull latest Docker image by commit SHA tag"
-        run: |
-            export IMAGE_TAG=${{ github.sha }}
-            docker compose -f docker-compose.prod.yml pull itadaki_web
+        run: docker pull ghcr.io/owner/itadaki-web:${{ github.sha }}
+
       - name: Start containers using pulled image
         run: docker compose --env-file .env -f docker-compose.prod.yml up -d --remove-orphans --force-recreate
 
