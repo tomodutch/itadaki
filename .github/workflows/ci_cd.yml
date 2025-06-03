@@ -113,8 +113,15 @@ jobs:
       - name: "Pull latest Docker image by commit SHA tag"
         run: docker pull ghcr.io/${{ github.repository_owner }}/itadaki-web:${{ github.sha }}
 
+      - name: create override file
+        run : |
+            cat <<EOF > docker-compose.override.yml
+            services:
+                itadaki_web:
+                    image: ghcr.io/${{ github.repository_owner }}/itadaki-web:${{ github.sha }}
+            EOF
       - name: Start containers using pulled image
-        run: docker compose --env-file .env -f docker-compose.prod.yml up -d --remove-orphans --force-recreate
+        run: docker compose --env-file .env -f docker-compose.prod.yml -f docker-compose.override.yml up -d --remove-orphans --force-recreate
 
       - name: Clean up unused Docker resources
         run: docker system prune -af
