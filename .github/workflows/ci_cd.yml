@@ -109,9 +109,10 @@ jobs:
           IMAGE_TAG=${{ github.sha }}
           EOF
 
-      - name: Pull latest Docker image by commit SHA tag
-        run: docker compose -f docker-compose.prod.yml pull itadaki_web
-
+      - name: "Pull latest Docker image by commit SHA tag"
+        run: |
+            export IMAGE_TAG=${{ github.sha }}
+            docker compose -f docker-compose.prod.yml pull itadaki_web
       - name: Start containers using pulled image
         run: docker compose --env-file .env -f docker-compose.prod.yml up -d --remove-orphans --force-recreate
 
