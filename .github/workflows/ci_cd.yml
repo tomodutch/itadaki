@@ -84,7 +84,7 @@ jobs:
         run: echo "REPO_OWNER=${{ github.repository_owner }}" >> $GITHUB_ENV
 
       - name: Start containers using pulled image
-        run: docker compose --env-file .env -f docker-compose.prod.yml up -d --remove-orphans
+        run: docker compose --env-file .env -f docker-compose.prod.yml up -d --remove-orphans --force-recreate
 
       - name: Clean up unused Docker resources
         run: docker system prune -af
