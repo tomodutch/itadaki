@@ -81,7 +81,7 @@ jobs:
         run: echo "REPO_OWNER=${{ github.repository_owner }}" >> $GITHUB_ENV
 
       - name: Pull latest Docker image
-        run: docker compose pull --env-file .env -f docker-compose.prod.yml itadaki_web
+        run: docker compose pull -f docker-compose.prod.yml itadaki_web
 
       - name: Start containers using pulled image
         run: docker compose --env-file .env -f docker-compose.prod.yml up -d --remove-orphans --force-recreate
