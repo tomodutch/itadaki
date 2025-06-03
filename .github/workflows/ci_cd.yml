@@ -59,7 +59,7 @@ jobs:
 
       - name: "Clean up old Docker images (Retention: keep latest 5)"
         env:
-          GHCR_PAT: ${{ secrets.GHCR_PAT }}
+          GH_TOKEN: ${{ secrets.GHCR_PAT }}
           REPO: ${{ github.repository_owner }}/itadaki-web
         run: |
           echo "Cleaning up old Docker images..."
