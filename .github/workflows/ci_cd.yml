@@ -55,10 +55,7 @@ jobs:
 
       - name: Build and Push Docker Image
         id: build_push
-        run: |
-          IMAGE_TAG=${{ github.sha }}
-          docker buildx build --push --no-cache \
-            -t ghcr.io/${{ github.repository_owner }}/itadaki-web:${IMAGE_TAG} 
+        run: docker buildx build --push --no-cache -t ghcr.io/${{ github.repository_owner }}/itadaki-web:${{github.sha}} .
 
       - name: "Clean up old Docker images (Retention: keep latest 5)"
         env:
