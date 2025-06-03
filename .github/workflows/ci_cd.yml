@@ -48,7 +48,7 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          docker build -t ghcr.io/${{ github.repository_owner }}/itadaki-web:latest .
+          docker build --no-cache -t ghcr.io/${{ github.repository_owner }}/itadaki-web:latest .
           docker push ghcr.io/${{ github.repository_owner }}/itadaki-web:latest
 
   deploy:
@@ -58,9 +58,6 @@ jobs:
     steps:
       - name: Log in to GitHub Container Registry
         run: echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
-      - name: Pull latest Docker image
-        run: docker pull ghcr.io/${{ github.repository_owner }}/itadaki-web:latest
 
       - name: Create .env file
         run: |
@@ -82,6 +79,9 @@ jobs:
 
       - name: Set REPO_OWNER
         run: echo "REPO_OWNER=${{ github.repository_owner }}" >> $GITHUB_ENV
+
+      - name: Pull latest Docker image
+        run: docker compose pull --env-file .env -f docker-compose.prod.yml itadaki_web
 
       - name: Start containers using pulled image
         run: docker compose --env-file .env -f docker-compose.prod.yml up -d --remove-orphans --force-recreate
