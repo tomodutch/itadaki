@@ -1,5 +1,6 @@
 import * as React from "react"
 import { UtensilsCrossed, ChartNoAxesCombined, NotebookPen, ChefHat } from "lucide-react"
+import Link from "next/link";
 
 import {
   Sidebar,
@@ -17,13 +18,13 @@ const data = {
   navMain: [
     {
       title: "Statistics",
-      url: "#",
+      url: "/dashboard",
       isActive: true,
       icon: ChartNoAxesCombined,
     },
     {
       title: "Diary",
-      url: "#",
+      url: "/dashboard/diary",
       isActive: false,
       icon: NotebookPen,
     },
@@ -63,7 +64,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               {data.navMain.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild isActive={item.isActive}>
-                    <a href={item.url} className="flex items-center gap-2"><item.icon className="size-4" />  {item.title}</a>
+                    <Link href={item.url} className="flex items-center gap-2"><item.icon className="size-4" />  {item.title}</Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
