@@ -39,6 +39,8 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     needs: [test, cancel_previous_builds]
+    outputs:
+      image_digest: ${{ steps.push.outputs.image_digest }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -47,9 +49,12 @@ jobs:
         run: echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Build and Push Docker Image
+        id: push
         run: |
           docker build --no-cache -t ghcr.io/${{ github.repository_owner }}/itadaki-web:latest .
           docker push ghcr.io/${{ github.repository_owner }}/itadaki-web:latest
+          IMAGE_DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/${{ github.repository_owner }}/itadaki-web:latest)
+          echo "image_digest=${IMAGE_DIGEST#*@}" >> $GITHUB_OUTPUT
 
   deploy:
     if: github.ref == 'refs/heads/main'
@@ -75,6 +80,7 @@ jobs:
           NEXT_PUBLIC_SENTRY_DSN=${{ vars.NEXT_PUBLIC_SENTRY_DSN }}
           SERVER_SENTRY_DSN=${{ vars.SERVER_SENTRY_DSN }}
           NEXTAUTH_URL=https://itadaki.app
+          IMAGE_DIGEST=${{ needs.build_and_push.outputs.image_digest }}
           EOF
 
       - name: Set REPO_OWNER
