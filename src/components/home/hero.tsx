@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { LogIn, User, Nut, Apple, EggFried, Fish, Carrot, Salad } from "lucide-react";
+import { LogIn, User, Nut, Apple, EggFried, Fish, Carrot, Salad, Cherry, Croissant } from "lucide-react";
 import Link from "next/link";
 
 const floatingFoods = [
@@ -25,22 +25,34 @@ const floatingFoods = [
     },
     {
         icon: Fish,
-        className: "absolute top-16 left-1/2 text-blue-400 opacity-20 pointer-events-none",
+        className: "absolute top-16 left-1/2 text-blue-400 opacity-20 pointer-events-none hidden md:block",
         animate: { y: [0, 8, 0] },
         transition: { duration: 6.4, repeat: Infinity, ease: "easeInOut", delay: 0.2 },
     },
     {
         icon: Nut,
-        className: "absolute bottom-28 right-6 text-yellow-900 opacity-20 pointer-events-none",
+        className: "absolute bottom-28 right-6 text-yellow-900 opacity-20 pointer-events-none sm:invisible",
         animate: { y: [0, 6, 0] },
         transition: { duration: 7.5, repeat: Infinity, ease: "easeInOut", delay: 0.4 },
     },
     {
         icon: Salad,
-        className: "absolute top-8 left-1/3 text-green-500 opacity-20 pointer-events-none",
+        className: "absolute top-8 left-1/3 text-green-500 opacity-20 pointer-events-none hidden md:block",
         animate: { y: [0, 11, 0] },
         transition: { duration: 6.3, repeat: Infinity, ease: "easeInOut", delay: 0.2 },
     },
+    {
+        icon: Cherry,
+        className: "absolute bottom-16 right-4 text-red-400 opacity-20 pointer-events-none hidden md:block",
+        animate: { y: [0, 13, 0] },
+        transition: { duration: 7.1, repeat: Infinity, ease: "easeInOut", delay: 0.2 },
+    },
+    {
+        icon: Croissant,
+        className: "absolute top-40 left-2 text-yellow-400 opacity-20 pointer-events-none",
+        animate: { y: [0, 7, 0] },
+        transition: { duration: 6.6, repeat: Infinity, ease: "easeInOut", delay: 0.25 },
+    }
 ];
 
 
@@ -55,7 +67,7 @@ export default function Hero() {
                     transition={transition}
                     aria-hidden="true"
                 >
-                    <Icon size={32} />
+                    <Icon size={72} />
                 </motion.div>
             ))}
 
