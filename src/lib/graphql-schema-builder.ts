@@ -1,12 +1,13 @@
 import SchemaBuilder from '@pothos/core';
 import prisma from '@/lib/prisma';
 import PrismaPlugin from '@pothos/plugin-prisma';
-import { PrismaObjectFieldBuilder } from '@pothos/plugin-prisma';
+
 // This is the default location for the generator, but this can be
 // customized as described above.
 // Using a type only import will help avoid issues with undeclared
 // exports in esm mode
 import type PrismaTypes from '@/db/generated/pothos';
+
 
 const builder = new SchemaBuilder<{
   PrismaTypes: PrismaTypes;
@@ -26,7 +27,7 @@ const builder = new SchemaBuilder<{
 });
 
 builder.prismaObject('User', {
-  fields: (t: PrismaObjectFieldBuilder<PrismaTypes, "User">) => ({
+  fields: (t) => ({
     id: t.exposeID('id'),
     name: t.exposeString('name', { nullable: true }),
     image: t.exposeString('image', { nullable: true }),
