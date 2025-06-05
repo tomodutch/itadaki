@@ -109,6 +109,7 @@ jobs:
           NEXTAUTH_URL=https://itadaki.app
           IMAGE_TAG=${{ github.sha }}
           REPO_OWNER=${{ github.repository_owner }}
+          AUTH_TRUST_HOST=true
           EOF
 
       - name: "Pull latest Docker image by commit SHA tag"
