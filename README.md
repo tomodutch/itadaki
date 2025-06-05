@@ -61,6 +61,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser to see the a
    - **Application name**: `Itadaki` (or any name you like)
    - **Homepage URL**: `http://localhost:3000`
    - **Authorization callback URL**: `http://localhost:3000/api/auth/callback/github`
+4. Make sure to set Email addresses to read only 
 4. After creating the app, copy your **Client ID** and **Client Secret**.
 5. Add them to your environment variables:
    ```env
