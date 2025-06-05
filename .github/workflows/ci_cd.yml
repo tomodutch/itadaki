@@ -99,6 +99,7 @@ jobs:
           DB_NAME=${{ vars.DB_NAME }}
           DB_USER=${{ vars.DB_USER }}
           DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+          DATABASE_URL=postgresql://${{ vars.DB_USER }}:${{ secrets.DB_PASSWORD }}@db:5432/${{ vars.DB_NAME }}
           POSTGRES_DB=${{ vars.DB_NAME }}
           POSTGRES_USER=${{ vars.DB_USER }}
           POSTGRES_PASSWORD=${{ secrets.DB_PASSWORD }}
@@ -122,6 +123,9 @@ jobs:
             EOF
       - name: Start containers using pulled image
         run: docker compose --env-file .env -f docker-compose.prod.yml -f docker-compose.override.yml up -d --remove-orphans --force-recreate
+
+      - name: Run Prisma migrations
+        run: docker compose exec itadaki_web npx prisma migrate deploy
 
       - name: Clean up unused Docker resources
         run: docker system prune -af

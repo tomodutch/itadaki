@@ -66,6 +66,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser to see the a
    ```env
    GITHUB_ID=<your client ID>
    GITHUB_SECRET=<your client secret>
+6. Migrate the database ˜npx prisma migrate dev˜
 ---
 
 ## 🧪 Storybook
