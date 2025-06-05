@@ -56,8 +56,11 @@ const floatingFoods = [
     }
 ];
 
+export interface HeroProps {
+    isLoggedIn: boolean
+}
 
-export default function Hero() {
+export default function Hero(props: HeroProps) {
     return (
         <section className="relative flex flex-1 flex-col items-center justify-center text-center px-6 py-24 md:py-32 bg-gradient-to-b from-[#f0f4ff] to-white overflow-hidden">
             {floatingFoods.map(({ icon: Icon, className, animate, transition }, i) => (
@@ -96,7 +99,7 @@ export default function Hero() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
             >
-                itadaki <UtensilsCrossed className="w-[1em] h-[1em]"  />
+                itadaki <UtensilsCrossed className="w-[1em] h-[1em]" />
             </motion.h1>
 
             {/* Subtext */}
@@ -116,16 +119,7 @@ export default function Hero() {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4, duration: 0.6 }}
             >
-                <Button size="lg" className="w-full sm:w-auto">
-                    <User className="mr-2 h-5 w-5" />
-                    Try as Guest
-                </Button>
-                <Link href="/login" className="w-full sm:w-auto">
-                    <Button size="lg" variant="outline" className="w-full sm:w-auto">
-                        <LogIn className="mr-2 h-5 w-5" />
-                        Login
-                    </Button>
-                </Link>
+                <ActionButtons {...props} />
             </motion.div>
 
             <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none pointer-events-none z-10">
@@ -141,5 +135,33 @@ export default function Hero() {
                 </svg>
             </div>
         </section>
+    );
+}
+
+function ActionButtons({ isLoggedIn }: HeroProps) {
+    if (isLoggedIn) {
+        return (
+            <Link href="/dashboard" className="w-full sm:w-auto">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto">
+                    <LogIn className="mr-2 h-5 w-5" />
+                    Start tracking
+                </Button>
+            </Link>
+        );
+    }
+
+    return (
+        <>
+            <Button size="lg" className="w-full sm:w-auto">
+                <User className="mr-2 h-5 w-5" />
+                Try as Guest
+            </Button>
+            <Link href="/login" className="w-full sm:w-auto">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto">
+                    <LogIn className="mr-2 h-5 w-5" />
+                    Login
+                </Button>
+            </Link>
+        </>
     );
 }

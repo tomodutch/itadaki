@@ -1,9 +1,12 @@
 import * as HomeComponents from "@/components/home/index";
+import {auth} from "@/lib/auth";
 
-export default function Home() {
+export default async function Home() {
+  const session = await auth();
+  const isLoggedIn = !!session?.user;
   return (
     <main className="min-h-screen bg-gradient-to-b from-white to-slate-100 flex flex-col">
-      <HomeComponents.Hero />
+      <HomeComponents.Hero isLoggedIn={isLoggedIn} />
       <HomeComponents.HowItWorks />
       <HomeComponents.Demo />
       <HomeComponents.Benefits />
