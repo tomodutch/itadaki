@@ -24,6 +24,8 @@ model User {
   accounts      Account[]
   Authenticator Authenticator[]
   sessions      Session[]
+  foodTemplates FoodTemplate[]
+  diaryEntries  DiaryEntry[]
 }
 
 model Account {
@@ -74,4 +76,141 @@ model Authenticator {
   user                 User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, credentialID])
+}
+
+model FoodTemplate {
+  id     String  @id @default(cuid())
+  userId String
+  name   String
+  brand  String?
+
+  servingSize Float
+  servingUnit String
+
+  barCode String?
+
+  calories     Int
+  protein      Float?
+  carbs        Float?
+  sugar        Float?
+  fiber        Float?
+  fat          Float?
+  saturatedFat Float?
+  transFat     Float?
+  cholesterol  Float?
+
+  // all values are in mg
+  sodium    Float?
+  potassium Float?
+
+  vitaminA Float?
+  vitaminC Float?
+  vitaminD Float?
+  vitaminE Float?
+  vitaminK Float?
+
+  vitaminB1  Float?
+  vitaminB2  Float?
+  vitaminB3  Float?
+  vitaminB5  Float?
+  vitaminB6  Float?
+  vitaminB7  Float?
+  vitaminB9  Float?
+  vitaminB12 Float?
+
+  calcium    Float?
+  iron       Float?
+  magnesium  Float?
+  phosphorus Float?
+  zinc       Float?
+  copper     Float?
+  manganese  Float?
+  selenium   Float?
+
+  alcohol  Float?
+  caffeine Float?
+
+  origin       String
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  deletedAt    DateTime?
+  diaryEntries DiaryEntry[]
+
+  @@index([userId, deletedAt])
+}
+
+model DiaryEntryCategory {
+  id  String @id @default(cuid())
+  key String @unique
+
+  diaryEntries DiaryEntry[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  deletedAt    DateTime?
+}
+
+model DiaryEntry {
+  id             String @id @default(cuid())
+  userId         String
+  foodTemplateId String
+
+  servingSize Float
+  servingUnit String
+  servings    Float  @default(1)
+
+  date DateTime @db.Date
+
+  calories     Int
+  protein      Float?
+  carbs        Float?
+  sugar        Float?
+  fiber        Float?
+  fat          Float?
+  saturatedFat Float?
+  transFat     Float?
+  cholesterol  Float?
+
+  // all values are in mg
+  sodium    Float?
+  potassium Float?
+
+  vitaminA Float?
+  vitaminC Float?
+  vitaminD Float?
+  vitaminE Float?
+  vitaminK Float?
+
+  vitaminB1  Float?
+  vitaminB2  Float?
+  vitaminB3  Float?
+  vitaminB5  Float?
+  vitaminB6  Float?
+  vitaminB7  Float?
+  vitaminB9  Float?
+  vitaminB12 Float?
+
+  calcium    Float?
+  iron       Float?
+  magnesium  Float?
+  phosphorus Float?
+  zinc       Float?
+  copper     Float?
+  manganese  Float?
+  selenium   Float?
+
+  alcohol  Float?
+  caffeine Float?
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  foodTemplate FoodTemplate @relation(fields: [foodTemplateId], references: [id], onDelete: Cascade)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  deletedAt    DateTime?
+
+  // dont cascade on delete
+  category   DiaryEntryCategory? @relation(fields: [categoryId], references: [id])
+  categoryId String
+
+  @@index([userId, date])
 }
