@@ -129,7 +129,7 @@ jobs:
         run: docker compose exec itadaki_web npx prisma migrate deploy
 
       - name: Run Prisma seed
-        run: docker compose exec itadaki_web npx prisma seed
+        run: docker compose exec itadaki_web npx prisma db seed
 
       - name: Clean up unused Docker resources
         run: docker system prune -af
