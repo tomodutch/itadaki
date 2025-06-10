@@ -1,6 +1,7 @@
 import { getFoodTemplatesForUser } from "@/lib/api/food";
 import { auth } from "@/lib/auth";
 import Link from "next/link";
+import {redirect} from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
     Table,
@@ -14,8 +15,8 @@ import { Plus } from "lucide-react";
 
 export default async function Food() {
     const authSession = await auth();
-    if (!authSession || !authSession?.user) {
-        return <></>;
+    if (!authSession?.user?.id) {
+        return redirect("/");
     }
 
     const foodTemplates = await getFoodTemplatesForUser(authSession.user.id);
