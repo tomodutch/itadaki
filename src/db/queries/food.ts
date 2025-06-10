@@ -1,5 +1,5 @@
 import client from "@/lib/prisma";
-import { Prisma } from "@/db/generated/prisma";
+import { FoodTemplate, Prisma } from "@/db/generated/prisma";
 import { z } from "zod";
 import logger from "@/lib/logger";
 
@@ -128,7 +128,7 @@ interface GetFoodTemplateArgs {
     userId: string
 }
 
-export async function getFoodTemplates(args: GetFoodTemplateArgs) {
+export async function getFoodTemplates(args: GetFoodTemplateArgs): Promise<FoodTemplate[]> {
     try {
         logger.info("get food templates", { args });
         return await client.foodTemplate.findMany({ where: { userId: args.userId } });

@@ -1,5 +1,6 @@
+"use client";
+
 import { useState } from "react"
-import { format, addDays, subDays } from "date-fns"
 import {
     Dialog,
     DialogContent,
@@ -8,75 +9,159 @@ import {
     DialogFooter,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Search, Barcode, Plus, ChevronLeft, ChevronRight, CalendarIcon } from "lucide-react"
-import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"
-import { Calendar } from "@/components/ui/calendar"
+import { Search, Barcode, Plus } from "lucide-react"
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from "@/components/ui/accordion";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { diaryEntrySchema, DiaryEntryFormData } from "@/lib/schema/diary";
 
-const groups = ["Breakfast", "Lunch", "Dinner", "Snacks"] as const
-type Group = typeof groups[number]
+import { Input } from "@/components/ui/input";
 
-type FoodItem = {
-    title: string
-    amount: string
-    calories: number
+import {
+    Form,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormControl,
+    FormMessage,
+} from "@/components/ui/form";
+import { FoodTemplate, DiaryEntryCategory, DiaryEntry } from "@/db/generated/prisma";
+export interface OnAddDiaryItem {
+    servingSize: number,
+    servings: number,
+    foodTemplateId: string,
+    categoryId: string
+}
+interface FoodDiaryProps {
+    diaryEntries: { [key: string]: DiaryEntry[] },
+    foodTemplates: FoodTemplate[],
+    diaryCategories: DiaryEntryCategory[],
+    onAdd: (foodItem: OnAddDiaryItem) => Promise<DiaryEntry>
 }
 
-export function FoodDiary() {
+export function FoodDiary(props: FoodDiaryProps) {
     const [open, setOpen] = useState(false)
-    const [activeGroup, setActiveGroup] = useState<Group>("Breakfast")
-    const [items, setItems] = useState<Record<Group, FoodItem[]>>({
-        Breakfast: [],
-        Lunch: [],
-        Dinner: [],
-        Snacks: [],
-    })
-
     const [searchTab, setSearchTab] = useState("foods")
     const [searchQuery, setSearchQuery] = useState("")
-    const [date, setDate] = useState<Date | undefined>(new Date())
+    const [selectedTemplate, setSelectedTemplate] = useState<FoodTemplate | null>(null);
+    const [subDialogOpen, setSubDialogOpen] = useState(false);
+    const [groupedDiaryEntries, setGroupedDiaryEntries] = useState(props.diaryEntries);
 
-    const handleAdd = (item: FoodItem) => {
-        if (!activeGroup) return
-        setItems((prev) => ({
-            ...prev,
-            [activeGroup]: [...prev[activeGroup], item],
-        }))
-        setOpen(false)
+    const diaryEntryForm = useForm<DiaryEntryFormData>({
+        resolver: zodResolver(diaryEntrySchema),
+        defaultValues: {
+            servings: 1,
+            servingSize: 1
+        },
+    });
+
+    const servings = diaryEntryForm.watch("servings");
+    const servingSize = diaryEntryForm.watch("servingSize");
+    const servingFactor = Number(servings || 0) * Number(servingSize || 0);
+
+    async function onSubmit(values: DiaryEntryFormData) {
+        if (!selectedTemplate) return;
+
+        const fd = new FormData();
+        Object.entries(values).forEach(([key, value]) =>
+            fd.append(key, value?.toString() ?? "")
+        );
+
+        const diaryItem: OnAddDiaryItem = {
+            servingSize,
+            servings,
+            categoryId: values.categoryId,
+            foodTemplateId: selectedTemplate.id
+        };
+
+        const newEntry = await props.onAdd(diaryItem);
+
+        setSubDialogOpen(false);
+        setSelectedTemplate(null);
+        diaryEntryForm.reset();
+
+        setGroupedDiaryEntries({
+            ...groupedDiaryEntries, "Breakfast": [
+                ...groupedDiaryEntries["Breakfast"],
+                newEntry
+            ]
+        });
     }
-
-    const goToPreviousDay = () => setDate((d) => (d ? subDays(d, 1) : new Date()))
-    const goToNextDay = () => setDate((d) => (d ? addDays(d, 1) : new Date()))
 
     return (
         <>
-            {/* Date selector with arrows, neat row and spacing */}
+            <Button
+                className="fixed bottom-6 right-6 rounded-full h-14 w-14 p-0 shadow-lg"
+                size="icon"
+                onClick={() => {
+                    setOpen(true);
+                }}
+            >
+                <Plus />
+            </Button>
+
+            <Accordion
+                type="multiple"
+                className="w-full"
+                defaultValue={["breakfast"]}
+            >
+                <AccordionItem value="breakfast">
+                    <AccordionTrigger>
+                        <div className="mt-2 w-full text-sm text-muted-foreground font-medium">
+                            <div className="grid grid-cols-5 text-left">
+                                <div className="text-foreground">Breakfast</div>
+                                <div>1,723 kcal</div>
+                                <div>120 protein</div>
+                                <div>260 carbs</div>
+                                <div>90 fat</div>
+                            </div>
+                        </div>
+
+                    </AccordionTrigger>
+                    <AccordionContent className="flex flex-col gap-4 text-balance text-sm text-muted-foreground font-medium">
+                        {
+                            (groupedDiaryEntries["Breakfast"] || []).map((e) =>
+                            (<div className="grid grid-cols-5 text-left" key={e.id}>
+                                <span className="text-foreground">{e.name}</span>
+                                <span>{e.calories} kcal</span>
+                                <span>{e.protein || 0} protein</span>
+                                <span>{e.carbs || 0} carbs</span>
+                                <span>{e.fat || 0} fat</span>
+                            </div>))
+                        }
+                    </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="lunch">
+                    <AccordionTrigger>Lunch</AccordionTrigger>
+                    <AccordionContent className="flex flex-col gap-4 text-balance">
+                        <p>
+                        </p>
+                    </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="dinner">
+                    <AccordionTrigger>Dinner</AccordionTrigger>
+                    <AccordionContent className="flex flex-col gap-4 text-balance">
+                        <p>
+                        </p>
+                    </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="snack">
+                    <AccordionTrigger>Snack</AccordionTrigger>
+                    <AccordionContent className="flex flex-col gap-4 text-balance">
+                        <p>
+                        </p>
+                    </AccordionContent>
+                </AccordionItem>
+            </Accordion>
+
             <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-sm border-b border-border py-3">
-                <div className="flex items-center justify-center gap-2 px-4">
-                    <Button variant="ghost" size="icon" onClick={goToPreviousDay}>
-                        <ChevronLeft className="w-5 h-5" />
-                    </Button>
-
-                    <Popover>
-                        <PopoverTrigger asChild>
-                            <Button variant="outline" className="flex items-center gap-2 px-4 py-2 text-base font-medium">
-                                <CalendarIcon className="w-4 h-4" />
-                                {format(date || new Date(), "EEE, MMM d, yyyy")}
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0">
-                            <Calendar mode="single" selected={date} onSelect={setDate} initialFocus />
-                        </PopoverContent>
-                    </Popover>
-
-                    <Button variant="ghost" size="icon" onClick={goToNextDay}>
-                        <ChevronRight className="w-5 h-5" />
-                    </Button>
-                </div>
-
                 <div className="mt-2 w-full text-sm text-muted-foreground font-medium">
                     <div className="grid grid-cols-4 text-center">
                         <div>
@@ -99,115 +184,165 @@ export function FoodDiary() {
                 </div>
             </div>
 
-            {/* Tabs */}
-            <Tabs value={activeGroup ?? ""} onValueChange={(val) => setActiveGroup(val as Group)} className="flex flex-col gap-4">
-                <TabsList className="grid grid-cols-4 border-b border-gray-200 w-full">
-                    {groups.map((group) => (
-                        <TabsTrigger
-                            key={group}
-                            value={group}
-                        >
-                            {group}
-                        </TabsTrigger>
-                    ))}
-                </TabsList>
+            <Dialog
+                open={open}
+                onOpenChange={(state) => {
+                    setOpen(state)
+                    if (!state) setSearchQuery("")
+                }}
+            >
+                <DialogContent className="sm:max-w-[600px] max-h-[70vh] overflow-auto">
+                    <DialogHeader>
+                        <DialogTitle>Add to group</DialogTitle>
+                    </DialogHeader>
 
-                {groups.map((group) => (
-                    <TabsContent key={group} value={group} className="p-4">
-                        <Card className="shadow-none border border-gray-100 rounded-md">
-                            <CardContent className="flex flex-col space-y-3 text-sm p-4">
-                                {items[group].length === 0 ? (
-                                    <p className="text-muted-foreground">No items added yet.</p>
-                                ) : (
-                                    items[group].map((item, i) => (
-                                        <div key={i} className="flex justify-between">
-                                            <div>
-                                                <p className="font-semibold leading-none">{item.title}</p>
-                                                <p className="text-xs text-muted-foreground">{item.amount}</p>
-                                            </div>
-                                            <div className="text-sm font-semibold text-right whitespace-nowrap">
-                                                {item.calories} kcal
-                                            </div>
-                                        </div>
-                                    ))
-                                )}
-                            </CardContent>
+                    <div className="relative mt-2">
+                        <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                            className="pl-10 pr-10"
+                            placeholder="Search foods, meals or recipes"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                        <Barcode className="absolute right-3 top-3 h-4 w-4 text-muted-foreground cursor-pointer" />
+                    </div>
 
-                            <CardFooter className="flex items-center justify-between px-4 py-3 border-t border-gray-100">
-                                <Dialog
-                                    open={open && activeGroup === group}
-                                    onOpenChange={(state) => {
-                                        setOpen(state)
-                                        if (!state) setSearchQuery("")
-                                    }}
-                                >
-                                    <DialogContent className="sm:max-w-[600px] max-h-[70vh] overflow-auto">
-                                        <DialogHeader>
-                                            <DialogTitle>Add to {group}</DialogTitle>
-                                        </DialogHeader>
+                    <Tabs value={searchTab} onValueChange={setSearchTab} className="pt-4">
+                        <TabsList className="grid w-full grid-cols-3">
+                            <TabsTrigger value="foods">Foods</TabsTrigger>
+                            <TabsTrigger value="meals">Meals</TabsTrigger>
+                            <TabsTrigger value="recipes">Recipes</TabsTrigger>
+                        </TabsList>
 
-                                        <div className="relative mt-2">
-                                            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                                            <Input
-                                                className="pl-10 pr-10"
-                                                placeholder="Search foods, meals or recipes"
-                                                value={searchQuery}
-                                                onChange={(e) => setSearchQuery(e.target.value)}
-                                            />
-                                            <Barcode className="absolute right-3 top-3 h-4 w-4 text-muted-foreground cursor-pointer" />
-                                        </div>
+                        <TabsContent value="foods" className="mt-4 text-sm text-muted-foreground">
+                            {
+                                props.foodTemplates.map((t) => (
+                                    <Button
+                                        key={t.id}
+                                        variant="ghost"
+                                        className="justify-between w-full"
+                                        onClick={() => {
+                                            setSelectedTemplate(t);
+                                            setSubDialogOpen(true);
+                                        }}
+                                    >
+                                        <span>{t.name}</span>
+                                        <span className="text-sm text-muted-foreground">{t.calories} kcal</span>
+                                    </Button>
+                                ))
+                            }
+                        </TabsContent>
+                        <TabsContent value="meals" className="mt-4">(mock meals)</TabsContent>
+                        <TabsContent value="recipes" className="mt-4">(mock recipes)</TabsContent>
+                    </Tabs>
 
-                                        <Tabs value={searchTab} onValueChange={setSearchTab} className="pt-4">
-                                            <TabsList className="grid w-full grid-cols-3">
-                                                <TabsTrigger value="foods">Foods</TabsTrigger>
-                                                <TabsTrigger value="meals">Meals</TabsTrigger>
-                                                <TabsTrigger value="recipes">Recipes</TabsTrigger>
-                                            </TabsList>
+                    <DialogFooter>
+                        <Button onClick={() => setOpen(false)} variant="outline">
+                            Cancel
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+                <DialogTrigger asChild>
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                            setOpen(true)
+                        }}
+                    >
+                        <Plus className="h-4 w-4 mr-1" />
+                        Add
+                    </Button>
+                </DialogTrigger>
+            </Dialog>
 
-                                            <TabsContent value="foods" className="mt-4 text-sm text-muted-foreground">
-                                                {/* Mock search result */}
-                                                <Button
-                                                    onClick={() =>
-                                                        handleAdd({
-                                                            title: "Boiled Egg",
-                                                            amount: "1 large",
-                                                            calories: 78,
-                                                        })
-                                                    }
-                                                >
-                                                    Add Boiled Egg
-                                                </Button>
-                                            </TabsContent>
-                                            <TabsContent value="meals" className="mt-4">(mock meals)</TabsContent>
-                                            <TabsContent value="recipes" className="mt-4">(mock recipes)</TabsContent>
-                                        </Tabs>
+            <Dialog open={subDialogOpen} onOpenChange={setSubDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Add {selectedTemplate?.name}</DialogTitle>
+                    </DialogHeader>
 
-                                        <DialogFooter>
-                                            <Button onClick={() => setOpen(false)} variant="outline">
-                                                Cancel
-                                            </Button>
-                                        </DialogFooter>
-                                    </DialogContent>
-                                    <DialogTrigger asChild>
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => {
-                                                setActiveGroup(group)
-                                                setOpen(true)
-                                            }}
-                                        >
-                                            <Plus className="h-4 w-4 mr-1" />
-                                            Add
-                                        </Button>
-                                    </DialogTrigger>
-                                </Dialog>
-                                <div className="text-sm font-medium text-muted-foreground">Total: 520 kcal</div>
-                            </CardFooter>
-                        </Card>
-                    </TabsContent>
-                ))}
-            </Tabs>
+                    {selectedTemplate && (
+                        <Form {...diaryEntryForm}>
+                            <form onSubmit={diaryEntryForm.handleSubmit(onSubmit)}>
+                                <div className="space-y-4 mt-2">
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <FormField
+                                            name="servingSize"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Serving Size</FormLabel>
+                                                    <FormControl>
+                                                        <Input
+                                                            type="number"
+                                                            min={0}
+                                                            defaultValue={field.value}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <FormField
+                                            name="servings"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Servings</FormLabel>
+                                                    <FormControl>
+                                                        <Input
+                                                            type="number"
+                                                            min={0}
+                                                            defaultValue={field.value}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+
+                                    <FormField
+                                        control={diaryEntryForm.control}
+                                        name="categoryId"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Meal Type</FormLabel>
+                                                <FormControl>
+                                                    <select
+                                                        {...field}
+                                                        className="mt-2 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                                                        value={field.value ?? ""}
+                                                    >
+                                                        <option value="">Select meal type</option>
+                                                        {
+                                                            props.diaryCategories.map((c) => <option key={c.id} value={c.id}>{c.key}</option>)
+                                                        }
+                                                    </select>
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                                <div className="text-sm mt-2 space-y-1">
+                                    <div><strong>Preview:</strong></div>
+                                    <div>{selectedTemplate.calories * servingFactor} kcal</div>
+                                    <div>{(selectedTemplate.protein || 0) * servingFactor}g protein</div>
+                                    <div>{(selectedTemplate.carbs || 0) * servingFactor}g carbs</div>
+                                    <div>{(selectedTemplate.fat || 0) * servingFactor}g fat</div>
+                                </div>
+                                <DialogFooter className="mt-4">
+                                    <Button variant="ghost" type="button" onClick={() => setSubDialogOpen(false)}>
+                                        Cancel
+                                    </Button>
+                                    <Button type="submit">Add</Button>
+                                </DialogFooter>
+                            </form>
+                        </Form>
+                    )}
+                </DialogContent>
+            </Dialog>
         </>
     )
 }

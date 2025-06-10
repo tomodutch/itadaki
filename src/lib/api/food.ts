@@ -4,6 +4,7 @@ import { getFoodTemplates, createFoodTemplate } from "@/db/queries/food";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import logger from "@/lib/logger";
+import {getString, getNumber} from "./form-helpers";
 
 export async function getFoodTemplatesForUser(userId: string) {
     return await getFoodTemplates({
@@ -18,65 +19,46 @@ export async function createFoodTemplateForUser(formData: FormData) {
         return redirect("/");
     }
 
-    // Helper to safely get number from formData or undefined
-    const getNumber = (key: string) => {
-        const value = formData.get(key);
-        if (typeof value === "string" && value.trim() !== "") {
-            const n = Number(value);
-            return isNaN(n) ? undefined : n;
-        }
-        return undefined;
-    };
-
-    const getString = (key: string) => {
-        const value = formData.get(key);
-        if (typeof value === "string" && value.trim() !== "") {
-            return value.trim();
-        }
-
-        return undefined;
-    }
-
     const rawData = {
-        name: getString("name"),
-        brand: getString("brand"),
-        servingSize: getNumber("servingSize"),
-        servingUnit: getString("servingUnit"),
-        barCode: getString("barCode"),
-        calories: getNumber("calories"),
-        protein: getNumber("protein"),
-        carbs: getNumber("carbs"),
-        sugar: getNumber("sugar"),
-        fiber: getNumber("fiber"),
-        fat: getNumber("fat"),
-        saturatedFat: getNumber("saturatedFat"),
-        transFat: getNumber("transFat"),
-        cholesterol: getNumber("cholesterol"),
-        sodium: getNumber("sodium"),
-        potassium: getNumber("potassium"),
-        vitaminA: getNumber("vitaminA"),
-        vitaminC: getNumber("vitaminC"),
-        vitaminD: getNumber("vitaminD"),
-        vitaminE: getNumber("vitaminE"),
-        vitaminK: getNumber("vitaminK"),
-        vitaminB1: getNumber("vitaminB1"),
-        vitaminB2: getNumber("vitaminB2"),
-        vitaminB3: getNumber("vitaminB3"),
-        vitaminB5: getNumber("vitaminB5"),
-        vitaminB6: getNumber("vitaminB6"),
-        vitaminB7: getNumber("vitaminB7"),
-        vitaminB9: getNumber("vitaminB9"),
-        vitaminB12: getNumber("vitaminB12"),
-        calcium: getNumber("calcium"),
-        iron: getNumber("iron"),
-        magnesium: getNumber("magnesium"),
-        phosphorus: getNumber("phosphorus"),
-        zinc: getNumber("zinc"),
-        copper: getNumber("copper"),
-        manganese: getNumber("manganese"),
-        selenium: getNumber("selenium"),
-        alcohol: getNumber("alcohol"),
-        caffeine: getNumber("caffeine"),
+        name: getString(formData, "name"),
+        brand: getString(formData, "brand"),
+        servingSize: getNumber(formData, "servingSize"),
+        servingUnit: getString(formData, "servingUnit"),
+        barCode: getString(formData, "barCode"),
+        calories: getNumber(formData, "calories"),
+        protein: getNumber(formData, "protein"),
+        carbs: getNumber(formData, "carbs"),
+        sugar: getNumber(formData, "sugar"),
+        fiber: getNumber(formData, "fiber"),
+        fat: getNumber(formData, "fat"),
+        saturatedFat: getNumber(formData, "saturatedFat"),
+        transFat: getNumber(formData, "transFat"),
+        cholesterol: getNumber(formData, "cholesterol"),
+        sodium: getNumber(formData, "sodium"),
+        potassium: getNumber(formData, "potassium"),
+        vitaminA: getNumber(formData, "vitaminA"),
+        vitaminC: getNumber(formData, "vitaminC"),
+        vitaminD: getNumber(formData, "vitaminD"),
+        vitaminE: getNumber(formData, "vitaminE"),
+        vitaminK: getNumber(formData, "vitaminK"),
+        vitaminB1: getNumber(formData, "vitaminB1"),
+        vitaminB2: getNumber(formData, "vitaminB2"),
+        vitaminB3: getNumber(formData, "vitaminB3"),
+        vitaminB5: getNumber(formData, "vitaminB5"),
+        vitaminB6: getNumber(formData, "vitaminB6"),
+        vitaminB7: getNumber(formData, "vitaminB7"),
+        vitaminB9: getNumber(formData, "vitaminB9"),
+        vitaminB12: getNumber(formData, "vitaminB12"),
+        calcium: getNumber(formData, "calcium"),
+        iron: getNumber(formData, "iron"),
+        magnesium: getNumber(formData, "magnesium"),
+        phosphorus: getNumber(formData, "phosphorus"),
+        zinc: getNumber(formData, "zinc"),
+        copper: getNumber(formData, "copper"),
+        manganese: getNumber(formData, "manganese"),
+        selenium: getNumber(formData, "selenium"),
+        alcohol: getNumber(formData, "alcohol"),
+        caffeine: getNumber(formData, "caffeine"),
     };
 
     await createFoodTemplate({
