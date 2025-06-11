@@ -4,7 +4,7 @@ import { getDiaryCategoriesAndEntries } from "@/lib/api/diary";
 import { parseISO, isValid, startOfDay } from 'date-fns';
 
 interface PageProps {
-    params: { date: string };
+    params: Promise<{ date: string }>;
 }
 
 export default async function Dashboard(props: PageProps) {
