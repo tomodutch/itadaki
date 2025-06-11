@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import {
     Dialog,
     DialogContent,
@@ -46,10 +46,51 @@ interface FoodDiaryProps {
     isLoading?: boolean
 }
 
+interface Summary {
+    calories: number,
+    protein: number,
+    fat: number,
+    carbs: number
+}
+
 export function FoodDiary(props: FoodDiaryProps) {
     const [open, setOpen] = useState(false)
     const [selectedTemplate, setSelectedTemplate] = useState<FoodTemplate | null>(null);
     const [subDialogOpen, setSubDialogOpen] = useState(false);
+    const { summaries, dailySummary } = useMemo(() => {
+        const summaries = new Map<string, Summary>();
+        const dailySummary: Summary = {
+            calories: 0,
+            protein: 0,
+            fat: 0,
+            carbs: 0
+        };
+
+        for (const category of props.categorizedDiaryEntries) {
+            const summary: Summary = {
+                calories: 0,
+                protein: 0,
+                fat: 0,
+                carbs: 0
+            };
+
+            for (const diaryEntry of category.diaryEntries) {
+                summary.calories += diaryEntry.calories;
+                summary.protein += diaryEntry.protein || 0;
+                summary.fat += diaryEntry.fat || 0;
+                summary.carbs += diaryEntry.carbs || 0;
+            }
+
+            dailySummary.calories += summary.calories;
+            dailySummary.protein += summary.protein;
+            dailySummary.fat += summary.fat;
+            dailySummary.carbs += summary.carbs;
+
+            summaries.set(category.id, summary);
+        }
+        return { summaries, dailySummary };
+    }, [props.categorizedDiaryEntries]);
+
 
     return (
         <div className="relative">
@@ -62,8 +103,8 @@ export function FoodDiary(props: FoodDiaryProps) {
             >
                 <Plus />
             </Button>
-            <DailySummary />
-            <DiaryEntriesList groupedDiaryEntries={props.categorizedDiaryEntries} />
+            <DailySummary summary={dailySummary} />
+            <DiaryEntriesList groupedDiaryEntries={props.categorizedDiaryEntries} summaries={summaries} />
 
             <AddFoodTemplateDialog
                 open={open}
@@ -101,26 +142,30 @@ export function FoodDiary(props: FoodDiaryProps) {
     )
 }
 
-function DailySummary() {
+interface DailySummaryProps {
+    summary: Summary
+}
+
+function DailySummary(props: DailySummaryProps) {
     return (
         <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-sm border-b border-border py-3">
             <div className="mt-2 w-full text-sm text-muted-foreground font-medium">
                 <div className="grid grid-cols-4 text-center">
                     <div>
                         Total<br />
-                        <span className="text-foreground font-semibold">1,723 kcal</span>
+                        <span className="text-foreground font-semibold">{props.summary.calories} kcal</span>
                     </div>
                     <div>
                         Protein<br />
-                        <span className="text-foreground font-semibold">122 g</span>
+                        <span className="text-foreground font-semibold">{props.summary.protein} g</span>
                     </div>
                     <div>
                         Carbs<br />
-                        <span className="text-foreground font-semibold">144 g</span>
+                        <span className="text-foreground font-semibold">{props.summary.carbs} g</span>
                     </div>
                     <div>
                         Fat<br />
-                        <span className="text-foreground font-semibold">68 g</span>
+                        <span className="text-foreground font-semibold">{props.summary.fat} g</span>
                     </div>
                 </div>
             </div>
@@ -128,7 +173,8 @@ function DailySummary() {
     );
 }
 interface DiaryEntriesListProps {
-    groupedDiaryEntries: CategoryWithEntries[]
+    groupedDiaryEntries: CategoryWithEntries[],
+    summaries: Map<string, Summary>
 }
 function DiaryEntriesList(props: DiaryEntriesListProps) {
     return (
@@ -138,9 +184,22 @@ function DiaryEntriesList(props: DiaryEntriesListProps) {
             defaultValue={[]}
         >
             {
-                props.groupedDiaryEntries.map((category) =>
-                    <DiaryEntriesListGroup key={category.id} title={category.key} diaryEntries={category.diaryEntries} />
-                )
+                props.groupedDiaryEntries.map((category) => {
+                    const summary: Summary = props.summaries.get(category.id) || {
+                        calories: 0,
+                        fat: 0,
+                        protein: 0,
+                        carbs: 0
+                    };
+
+                    return (
+                        <DiaryEntriesListGroup
+                            key={category.id}
+                            title={category.key}
+                            diaryEntries={category.diaryEntries}
+                            summary={summary} />)
+
+                })
             }
         </Accordion>
     );
@@ -148,7 +207,8 @@ function DiaryEntriesList(props: DiaryEntriesListProps) {
 
 interface DiaryEntriesListGroupProps {
     title: string,
-    diaryEntries: DiaryEntry[]
+    diaryEntries: DiaryEntry[],
+    summary: Summary,
 }
 function DiaryEntriesListGroup(props: DiaryEntriesListGroupProps) {
     return (
@@ -157,10 +217,10 @@ function DiaryEntriesListGroup(props: DiaryEntriesListGroupProps) {
                 <div className="mt-2 w-full text-sm text-muted-foreground font-medium">
                     <div className="grid grid-cols-5 text-left">
                         <div className="text-foreground">{props.title}</div>
-                        <div>1,723 kcal</div>
-                        <div>120 protein</div>
-                        <div>260 carbs</div>
-                        <div>90 fat</div>
+                        <div>{props.summary.calories} kcal</div>
+                        <div>{props.summary.protein} protein</div>
+                        <div>{props.summary.carbs} carbs</div>
+                        <div>{props.summary.fat} fat</div>
                     </div>
                 </div>
 
