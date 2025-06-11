@@ -3,13 +3,13 @@ import { createDiaryEntry, getDiaryEntries, getDiaryCategories as getDiaryCatego
 import { ensureUserId } from "@/lib/auth";
 
 interface GetDiaryEntryForUserArgs {
-    userId: string,
     day: Date
 }
 
 export async function getDiaryEntriesForUser(args: GetDiaryEntryForUserArgs) {
+    const userId = await ensureUserId();
     return await getDiaryEntries({
-        userId: args.userId,
+        userId: userId,
         day: args.day
     });
 }

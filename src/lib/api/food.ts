@@ -1,12 +1,13 @@
 "use server";
 
 import { getFoodTemplates, createFoodTemplate } from "@/db/queries/food";
-import { auth } from "@/lib/auth";
+import { auth, ensureUserId } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import logger from "@/lib/logger";
 import {getString, getNumber} from "./form-helpers";
 
-export async function getFoodTemplatesForUser(userId: string) {
+export async function getFoodTemplatesForUser() {
+    const userId = await ensureUserId();
     return await getFoodTemplates({
         userId
     });
