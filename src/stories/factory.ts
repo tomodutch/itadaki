@@ -1,5 +1,6 @@
 import { DiaryEntry, FoodTemplate } from "@/db/generated/prisma";
 import { CategoryWithEntries } from "@/db/types";
+import { faker } from '@faker-js/faker';
 
 export function createCategory(partial: Partial<CategoryWithEntries>): CategoryWithEntries {
     const defaultValue: CategoryWithEntries = {
@@ -17,20 +18,20 @@ export function createCategory(partial: Partial<CategoryWithEntries>): CategoryW
 export function createDiaryEntry(partial: Partial<DiaryEntry>): DiaryEntry {
     const defaultValues: DiaryEntry = {
         id: createRandomId(),
-        name: "delicious healthy diary item",
-        calories: 100,
+        name: faker.food.ingredient(),
+        calories: faker.number.int({min: 10, max: 200}),
         userId: "me",
         date: new Date(),
         deletedAt: null,
         updatedAt: new Date(),
         createdAt: new Date(),
-        servingSize: 0,
-        servingUnit: '',
-        protein: null,
-        carbs: null,
+        servingSize: 1,
+        servingUnit: 'g',
+        protein: faker.number.int({min: 0, max: 80}),
+        carbs: faker.number.int({min: 0, max: 60}),
         sugar: null,
         fiber: null,
-        fat: null,
+        fat: faker.number.int({min: 0, max: 50}),
         saturatedFat: null,
         transFat: null,
         cholesterol: null,
@@ -69,7 +70,7 @@ export function createDiaryEntry(partial: Partial<DiaryEntry>): DiaryEntry {
 
 export function createFoodTemplate(partial: Partial<FoodTemplate>): FoodTemplate {
     const defaultValues: FoodTemplate = {
-        name: "food template1",
+        name: faker.food.ingredient(),
         id: createRandomId(),
         createdAt: new Date(),
         updatedAt: new Date(),

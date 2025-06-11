@@ -36,22 +36,15 @@ export const WithoutEntries: Story = {
     }
 };
 
-export const WithEntriesInBreakfast: Story = {
+export const WithEntries: Story = {
     args: {
         categorizedDiaryEntries: [
             factory.createCategory({
-                key: "Breakfast", diaryEntries: [
-                    factory.createDiaryEntry({
-                        calories: 100,
-                        protein: 10,
-                        carbs: 20,
-                        fat: 2
-                    })
-                ]
+                key: "Breakfast", diaryEntries: Array.from({length: 8}).map(() => factory.createDiaryEntry({}))
             }),
-            factory.createCategory({ key: "Lunch" }),
-            factory.createCategory({ key: "Dinner" }),
-            factory.createCategory({ key: "Snack" }),
+            factory.createCategory({ key: "Lunch", diaryEntries: Array.from({length: 6}).map(() => factory.createDiaryEntry({})) }),
+            factory.createCategory({ key: "Dinner", diaryEntries: Array.from({length: 4}).map(() => factory.createDiaryEntry({})) }),
+            factory.createCategory({ key: "Snack", diaryEntries: Array.from({length: 3}).map(() => factory.createDiaryEntry({})) }),
         ],
     }
 };

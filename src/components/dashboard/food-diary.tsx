@@ -204,37 +204,37 @@ function DiaryEntriesList(props: DiaryEntriesListProps) {
         </Accordion>
     );
 }
-
 interface DiaryEntriesListGroupProps {
     title: string,
     diaryEntries: DiaryEntry[],
     summary: Summary,
 }
 function DiaryEntriesListGroup(props: DiaryEntriesListGroupProps) {
+    const gridLayoutClasses = "grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-4 text-sm text-muted-foreground";
     return (
-        <AccordionItem value={props.title}>
-            <AccordionTrigger>
-                <div className="mt-2 w-full text-sm text-muted-foreground font-medium">
-                    <div className="grid grid-cols-5 text-left">
-                        <div className="text-foreground">{props.title}</div>
-                        <div>{props.summary.calories} kcal</div>
-                        <div>{props.summary.protein} protein</div>
-                        <div>{props.summary.carbs} carbs</div>
-                        <div>{props.summary.fat} fat</div>
+        <AccordionItem value={props.title} className="border border-border rounded-sm">
+            <AccordionTrigger className="py-2 px-4">
+                <div className="w-full">
+                    <div className={gridLayoutClasses + " font-medium"}>
+                        <span className="text-foreground">{props.title}</span>
+                        <span>{props.summary.calories} kcal</span>
+                        <span className="hidden sm:block">{props.summary.protein} protein</span>
+                        <span className="hidden sm:block">{props.summary.carbs} carbs</span>
+                        <span className="hidden sm:block">{props.summary.fat} fat</span>
                     </div>
                 </div>
-
             </AccordionTrigger>
-            <AccordionContent className="flex flex-col gap-4 text-balance text-sm text-muted-foreground font-medium">
+            <AccordionContent className="flex flex-col gap-3 px-4 py-2 pr-12">
                 {
-                    (props.diaryEntries).map((e) =>
-                    (<div className="grid grid-cols-5 text-left" key={e.id}>
-                        <span className="text-foreground">{e.name}</span>
-                        <span>{e.calories} kcal</span>
-                        <span>{e.protein || 0} protein</span>
-                        <span>{e.carbs || 0} carbs</span>
-                        <span>{e.fat || 0} fat</span>
-                    </div>))
+                    props.diaryEntries.map((e) => (
+                        <div className={gridLayoutClasses} key={e.id}>
+                            <span className="text-foreground">{e.name}</span>
+                            <span>{e.calories} kcal</span>
+                            <span className="hidden sm:block">{e.protein || 0} protein</span>
+                            <span className="hidden sm:block">{e.carbs || 0} carbs</span>
+                            <span className="hidden sm:block">{e.fat || 0} fat</span>
+                        </div>
+                    ))
                 }
             </AccordionContent>
         </AccordionItem>
