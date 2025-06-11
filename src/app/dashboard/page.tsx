@@ -1,15 +1,8 @@
-import ClientDashboard from "@/components/client-dashboard";
-import { FoodDiaryWrapper } from "@/components/dashboard/food-diary-wrapper";
+import { redirect } from "next/navigation";
 
-export default async function Dashboard() {
-    return (
-        <div className="flex flex-1 flex-col gap-4 p-4">
-            <h1 className="text-2xl font-bold">Diary</h1>
-            <p className="text-muted-foreground">Your personal diary entries will be displayed here.</p>
-            <FoodDiaryWrapper />
-            <ClientDashboard />
-        </div>
-    );
+export default async function DashboardRedirect() {
+    const today = new Date().toISOString().split('T')[0]; // "YYYY-MM-DD"
+    return redirect(`/dashboard/${today}`);
 }
 
 export const metadata = {
