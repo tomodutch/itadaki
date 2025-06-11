@@ -4,21 +4,18 @@ import { useEffect, useState, useCallback } from 'react';
 import { FoodDiary, OnAddDiaryItem } from './food-diary';
 import { FoodTemplate } from '@/db/generated/prisma';
 import { createDiaryEntryForUser, getDiaryCategoriesAndEntries } from '@/lib/api/diary';
-import { getFoodTemplatesForUser } from "@/lib/api/food";
 import { CategoryWithEntries } from '@/db/types';
 import { useUrlDate } from './use-url-date';
-export function FoodDiaryWrapper() {
-    const [foodTemplates, setFoodTemplates] = useState<FoodTemplate[]>([]);
-    const [diaryEntries, setDiaryEntries] = useState<CategoryWithEntries[]>([]);
+interface FoodDiaryWrapperProps {
+    foodTemplates: FoodTemplate[],
+    diaryEntries: CategoryWithEntries[]
+}
+
+export function FoodDiaryWrapper(props: FoodDiaryWrapperProps) {
+    const [diaryEntries, setDiaryEntries] = useState<CategoryWithEntries[]>(props.diaryEntries);
     const date = useUrlDate();
-
     const fetchData = useCallback(async () => {
-        const [templates, entries] = await Promise.all([
-            getFoodTemplatesForUser(),
-            getDiaryCategoriesAndEntries(date)
-        ]);
-
-        setFoodTemplates(templates);
+        const entries = await getDiaryCategoriesAndEntries(date);
         setDiaryEntries(entries);
     }, [date]);
 
@@ -40,7 +37,7 @@ export function FoodDiaryWrapper() {
 
     return (
         <FoodDiary
-            foodTemplates={foodTemplates}
+            foodTemplates={props.foodTemplates}
             categorizedDiaryEntries={diaryEntries}
             onAdd={onAdd}
         />
