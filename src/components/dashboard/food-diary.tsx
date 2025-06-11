@@ -22,7 +22,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { diaryEntrySchema, DiaryEntryFormData } from "@/lib/schema/diary";
 
 import { Input } from "@/components/ui/input";
-
 import {
     Form,
     FormField,
@@ -33,6 +32,7 @@ import {
 } from "@/components/ui/form";
 import { FoodTemplate, DiaryEntryCategory, DiaryEntry } from "@/db/generated/prisma";
 import { CategoryWithEntries } from "@/db/types";
+import { LoadingSpinner } from "../loading-spinner";
 export interface OnAddDiaryItem {
     servingSize: number,
     servings: number,
@@ -43,6 +43,7 @@ interface FoodDiaryProps {
     foodTemplates: FoodTemplate[],
     onAdd: (foodItem: OnAddDiaryItem) => Promise<void>,
     categorizedDiaryEntries: CategoryWithEntries[]
+    isLoading?: boolean
 }
 
 export function FoodDiary(props: FoodDiaryProps) {
@@ -51,7 +52,7 @@ export function FoodDiary(props: FoodDiaryProps) {
     const [subDialogOpen, setSubDialogOpen] = useState(false);
 
     return (
-        <>
+        <div className="relative">
             <Button
                 className="fixed bottom-6 right-6 rounded-full h-14 w-14 p-0 shadow-lg"
                 size="icon"
@@ -62,7 +63,7 @@ export function FoodDiary(props: FoodDiaryProps) {
                 <Plus />
             </Button>
             <DailySummary />
-            <DiaryEntriesList groups={["Breakfast", "Lunch", "Dinner", "Snacks"]} groupedDiaryEntries={props.categorizedDiaryEntries} />
+            <DiaryEntriesList groupedDiaryEntries={props.categorizedDiaryEntries} />
 
             <AddFoodTemplateDialog
                 open={open}
@@ -86,7 +87,17 @@ export function FoodDiary(props: FoodDiaryProps) {
                     }}
                 />
             )}
-        </>
+
+            {props.isLoading && (
+                <div
+                    className="absolute rounded-lg inset-0 bg-black/5 flex justify-center items-center z-50 pointer-events-auto"
+                    aria-busy="true"
+                    aria-label="Loading"
+                >
+                    <LoadingSpinner />
+                </div>
+            )}
+        </div>
     )
 }
 
@@ -117,7 +128,6 @@ function DailySummary() {
     );
 }
 interface DiaryEntriesListProps {
-    groups: string[],
     groupedDiaryEntries: CategoryWithEntries[]
 }
 function DiaryEntriesList(props: DiaryEntriesListProps) {

@@ -1,0 +1,63 @@
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import { FoodDiary } from "@/components/dashboard/food-diary";
+import { fn } from 'storybook/test';
+import * as factory from "../factory";
+
+const meta = {
+    title: 'Dashboard/FoodDiary',
+    component: FoodDiary,
+    parameters: {
+        layout: 'fullscreen',
+    },
+    args: {
+        foodTemplates: [
+            factory.createFoodTemplate({ name: "chicken" }),
+            factory.createFoodTemplate({ name: "browny" }),
+            factory.createFoodTemplate({ name: "tofu" }),
+            factory.createFoodTemplate({ name: "pizza" }),
+            factory.createFoodTemplate({ name: "high protein milk" }),
+        ],
+        categorizedDiaryEntries: [
+            factory.createCategory({ key: "Breakfast" }),
+            factory.createCategory({ key: "Lunch" }),
+            factory.createCategory({ key: "Dinner" }),
+            factory.createCategory({ key: "Snack" }),
+        ],
+        onAdd: fn(),
+        isLoading: false
+    }
+} satisfies Meta<typeof FoodDiary>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+export const WithoutEntries: Story = {
+    args: {
+    }
+};
+
+export const WithEntriesInBreakfast: Story = {
+    args: {
+        categorizedDiaryEntries: [
+            factory.createCategory({
+                key: "Breakfast", diaryEntries: [
+                    factory.createDiaryEntry({
+                        calories: 100,
+                        protein: 10,
+                        carbs: 20,
+                        fat: 2
+                    })
+                ]
+            }),
+            factory.createCategory({ key: "Lunch" }),
+            factory.createCategory({ key: "Dinner" }),
+            factory.createCategory({ key: "Snack" }),
+        ],
+    }
+};
+
+export const IsLoading: Story = {
+    args: {
+        isLoading: true
+    }
+}

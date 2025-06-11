@@ -1,8 +1,7 @@
-import { FoodDiaryWrapper } from "@/components/dashboard/food-diary-wrapper";
 import { getFoodTemplatesForUser } from "@/lib/api/food";
 import { getDiaryCategoriesAndEntries } from "@/lib/api/diary";
 import { parseISO, isValid, startOfDay } from 'date-fns';
-
+import ClientDashboard from "@/components/client-dashboard";
 interface PageProps {
     params: Promise<{ date: string }>;
 }
@@ -19,12 +18,7 @@ export default async function Dashboard(props: PageProps) {
     ]);
 
     return (
-        <div className="flex flex-1 flex-col gap-4 p-4">
-            <h1 className="text-2xl font-bold">Diary</h1>
-            <p className="text-muted-foreground">Your personal diary entries will be displayed here.</p>
-            <FoodDiaryWrapper foodTemplates={foodTemplates} diaryEntries={diaryEntries} />
-            {/* <ClientDashboard /> */}
-        </div>
+        <ClientDashboard foodTemplates={foodTemplates} diaryEntries={diaryEntries} />
     );
 }
 
