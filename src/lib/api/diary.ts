@@ -1,5 +1,5 @@
 "use server"
-import { createDiaryEntry, getDiaryEntries, getDiaryCategories as getDiaryCategoriesFromDb } from "@/db/queries/diary";
+import { createDiaryEntry, getDiaryEntries, getDiaryCategories as getDiaryCategoriesFromDb, getDiaryCategoriesAndEntries as getDiaryCategoriesAndEntriesFromDb } from "@/db/queries/diary";
 import { ensureUserId } from "@/lib/auth";
 
 interface GetDiaryEntryForUserArgs {
@@ -36,4 +36,9 @@ export async function createDiaryEntryForUser(args: CreateDiaryEntryForUserArgs)
 
 export async function getDiaryCategories() {
     return await getDiaryCategoriesFromDb();
+}
+
+export async function getDiaryCategoriesAndEntries(date: Date) {
+    const userId = await ensureUserId();
+    return await getDiaryCategoriesAndEntriesFromDb({ userId, date });
 }

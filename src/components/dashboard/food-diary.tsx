@@ -32,6 +32,7 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { FoodTemplate, DiaryEntryCategory, DiaryEntry } from "@/db/generated/prisma";
+import { CategoryWithEntries } from "@/db/types";
 export interface OnAddDiaryItem {
     servingSize: number,
     servings: number,
@@ -39,10 +40,9 @@ export interface OnAddDiaryItem {
     categoryId: string
 }
 interface FoodDiaryProps {
-    diaryEntries: { [key: string]: DiaryEntry[] },
     foodTemplates: FoodTemplate[],
-    diaryCategories: DiaryEntryCategory[],
-    onAdd: (foodItem: OnAddDiaryItem) => Promise<void>
+    onAdd: (foodItem: OnAddDiaryItem) => Promise<void>,
+    categorizedDiaryEntries: CategoryWithEntries[]
 }
 
 export function FoodDiary(props: FoodDiaryProps) {
@@ -62,7 +62,7 @@ export function FoodDiary(props: FoodDiaryProps) {
                 <Plus />
             </Button>
             <DailySummary />
-            <DiaryEntriesList groups={["Breakfast", "Lunch", "Dinner", "Snacks"]} groupedDiaryEntries={props.diaryEntries} />
+            <DiaryEntriesList groups={["Breakfast", "Lunch", "Dinner", "Snacks"]} groupedDiaryEntries={props.categorizedDiaryEntries} />
 
             <AddFoodTemplateDialog
                 open={open}
@@ -78,7 +78,7 @@ export function FoodDiary(props: FoodDiaryProps) {
                     open={subDialogOpen}
                     setOpen={setSubDialogOpen}
                     selectedTemplate={selectedTemplate}
-                    diaryCategories={props.diaryCategories}
+                    diaryCategories={props.categorizedDiaryEntries}
                     onAdd={async (i) => {
                         await props.onAdd(i);
                         setSubDialogOpen(false);
@@ -118,19 +118,18 @@ function DailySummary() {
 }
 interface DiaryEntriesListProps {
     groups: string[],
-    groupedDiaryEntries: { [key: string]: DiaryEntry[] }
+    groupedDiaryEntries: CategoryWithEntries[]
 }
 function DiaryEntriesList(props: DiaryEntriesListProps) {
     return (
-
         <Accordion
             type="multiple"
             className="w-full"
             defaultValue={[]}
         >
             {
-                props.groups.map((key) =>
-                    <DiaryEntriesListGroup key={key} title={key} diaryEntries={props.groupedDiaryEntries[key] || []} />
+                props.groupedDiaryEntries.map((category) =>
+                    <DiaryEntriesListGroup key={category.id} title={category.key} diaryEntries={category.diaryEntries} />
                 )
             }
         </Accordion>

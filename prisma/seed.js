@@ -4,25 +4,30 @@ const prisma = new PrismaClient()
 async function main() {
     const categories = [
         {
-            key: "Breakfast"
+            key: "Breakfast",
+            order: 0
         },
         {
-            key: "Lunch"
+            key: "Lunch",
+            order: 1
         },
         {
-            key: "Dinner"
+            key: "Dinner",
+            order: 2
         },
         {
-            key: "Snack"
+            key: "Snack",
+            order: 3
         }
     ];
 
-    const resp = await Promise.all(categories.map(({ key }) => {
+    const resp = await Promise.all(categories.map(({ key, order }) => {
         return prisma.diaryEntryCategory.upsert({
             where: { key },
-            update: {},
+            update: {order},
             create: {
-                key
+                key,
+                order
             }
         })
     }))

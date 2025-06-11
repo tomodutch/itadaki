@@ -2,6 +2,7 @@ import { DiaryEntry, Prisma } from "@/db/generated/prisma";
 import client from "@/lib/prisma";
 import logger from "@/lib/logger";
 import { z } from "zod";
+import { CategoryWithEntries } from "../types";
 
 interface createDiaryEntryArgs extends z.infer<typeof createDiaryEntrySchema> {
     date: Date,
@@ -179,4 +180,29 @@ export async function getDiaryEntries(args: GetDiaryEntriesArgs): Promise<DiaryE
 export async function getDiaryCategories() {
     return await client.diaryEntryCategory.findMany(
         { where: { deletedAt: null }, orderBy: { createdAt: "desc" } });
+}
+
+interface GetDiaryCategoriesAndEntriesArgs {
+    userId: string,
+    date?: Date
+}
+
+export async function getDiaryCategoriesAndEntries(args: GetDiaryCategoriesAndEntriesArgs): Promise<CategoryWithEntries[]> {
+    return await client.diaryEntryCategory.findMany({
+        where: {
+            deletedAt: null
+        },
+        orderBy: {
+            order: "asc"
+        },
+        include: {
+            diaryEntries: {
+                where: {
+                    userId: args.userId,
+                    deletedAt: null,
+                    date: args.date
+                }
+            }
+        }
+    });
 }
