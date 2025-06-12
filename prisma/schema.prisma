@@ -121,6 +121,7 @@ model FoodTemplate {
   alcohol      Float?
   caffeine     Float?
   origin       String
+  originId     String?
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
   deletedAt    DateTime?

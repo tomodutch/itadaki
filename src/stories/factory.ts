@@ -114,7 +114,8 @@ export function createFoodTemplate(partial: Partial<FoodTemplate>): FoodTemplate
         caffeine: null,
         brand: null,
         barCode: null,
-        origin: ""
+        origin: "",
+        originId: null
     };
 
     return { ...defaultValues, ...partial };

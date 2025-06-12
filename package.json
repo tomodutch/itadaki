@@ -10,7 +10,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "vitest --config=vitest.config.mts",
+    "test": "vitest --config vitest.config.mts && vitest --config vitest.config.storybook.mts",
+    "test:unit": "vitest --config vitest.config.mts",
+    "test:storybook": "vitest --config vitest.config.storybook.mts",
     "storybook": "storybook dev -p 6006",
     "test-storybook": "vitest --config=./.storybook/vitest.setup.ts",
     "build-storybook": "storybook build"

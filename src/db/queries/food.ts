@@ -1,68 +1,63 @@
-import client from "@/lib/prisma";
-import { FoodTemplate, Prisma } from "@/db/generated/prisma";
 import { z } from "zod";
+import { Prisma } from "@/db/generated/prisma";
+import client from "@/lib/prisma";
 import logger from "@/lib/logger";
 
-interface createFoodTemplateArgs extends z.infer<typeof createFoodTemplateSchema> {
-    name: string,
-    brand?: string,
-    servingSize: number,
-    servingUnit: string,
-    calories: number,
-    userId: string,
-}
+// Nutritional fields shared between schemas
+const nutritionFields = {
+  calories: z.number().nonnegative("Calories cannot be negative"),
 
+  protein: z.number().nonnegative().nullable().optional(),
+  carbs: z.number().nonnegative().nullable().optional(),
+  sugar: z.number().nonnegative().nullable().optional(),
+  fiber: z.number().nonnegative().nullable().optional(),
+  fat: z.number().nonnegative().nullable().optional(),
+  saturatedFat: z.number().nonnegative().nullable().optional(),
+  transFat: z.number().nonnegative().nullable().optional(),
+  cholesterol: z.number().nonnegative().nullable().optional(),
+  sodium: z.number().nonnegative().nullable().optional(),
+  potassium: z.number().nonnegative().nullable().optional(),
+
+  vitaminA: z.number().nonnegative().nullable().optional(),
+  vitaminC: z.number().nonnegative().nullable().optional(),
+  vitaminD: z.number().nonnegative().nullable().optional(),
+  vitaminE: z.number().nonnegative().nullable().optional(),
+  vitaminK: z.number().nonnegative().nullable().optional(),
+
+  vitaminB1: z.number().nonnegative().nullable().optional(),
+  vitaminB2: z.number().nonnegative().nullable().optional(),
+  vitaminB3: z.number().nonnegative().nullable().optional(),
+  vitaminB5: z.number().nonnegative().nullable().optional(),
+  vitaminB6: z.number().nonnegative().nullable().optional(),
+  vitaminB7: z.number().nonnegative().nullable().optional(),
+  vitaminB9: z.number().nonnegative().nullable().optional(),
+  vitaminB12: z.number().nonnegative().nullable().optional(),
+
+  calcium: z.number().nonnegative().nullable().optional(),
+  iron: z.number().nonnegative().nullable().optional(),
+  magnesium: z.number().nonnegative().nullable().optional(),
+  phosphorus: z.number().nonnegative().nullable().optional(),
+  zinc: z.number().nonnegative().nullable().optional(),
+  copper: z.number().nonnegative().nullable().optional(),
+  manganese: z.number().nonnegative().nullable().optional(),
+  selenium: z.number().nonnegative().nullable().optional(),
+
+  alcohol: z.number().nonnegative().nullable().optional(),
+  caffeine: z.number().nonnegative().nullable().optional(),
+};
+
+// Regular food template schema
 export const createFoodTemplateSchema = z.object({
     name: z.string().min(1, "Name is required"),
-    brand: z.string().min(1).optional(),
+    brand: z.string().min(1).nullable().optional(),
     servingSize: z.number().positive("Serving size must be positive"),
     servingUnit: z.string().min(1, "Serving unit is required"),
-    barCode: z.string().optional().transform((val) => (val === "" ? undefined : val)),
-    calories: z.number().nonnegative("Calories cannot be negative"),
-
-    protein: z.number().nonnegative().optional(),
-    carbs: z.number().nonnegative().optional(),
-    sugar: z.number().nonnegative().optional(),
-    fiber: z.number().nonnegative().optional(),
-    fat: z.number().nonnegative().optional(),
-    saturatedFat: z.number().nonnegative().optional(),
-    transFat: z.number().nonnegative().optional(),
-    cholesterol: z.number().nonnegative().optional(),
-
-    sodium: z.number().nonnegative().optional(),
-    potassium: z.number().nonnegative().optional(),
-
-    vitaminA: z.number().nonnegative().optional(),
-    vitaminC: z.number().nonnegative().optional(),
-    vitaminD: z.number().nonnegative().optional(),
-    vitaminE: z.number().nonnegative().optional(),
-    vitaminK: z.number().nonnegative().optional(),
-
-    vitaminB1: z.number().nonnegative().optional(),
-    vitaminB2: z.number().nonnegative().optional(),
-    vitaminB3: z.number().nonnegative().optional(),
-    vitaminB5: z.number().nonnegative().optional(),
-    vitaminB6: z.number().nonnegative().optional(),
-    vitaminB7: z.number().nonnegative().optional(),
-    vitaminB9: z.number().nonnegative().optional(),
-    vitaminB12: z.number().nonnegative().optional(),
-
-    calcium: z.number().nonnegative().optional(),
-    iron: z.number().nonnegative().optional(),
-    magnesium: z.number().nonnegative().optional(),
-    phosphorus: z.number().nonnegative().optional(),
-    zinc: z.number().nonnegative().optional(),
-    copper: z.number().nonnegative().optional(),
-    manganese: z.number().nonnegative().optional(),
-    selenium: z.number().nonnegative().optional(),
-
-    alcohol: z.number().nonnegative().optional(),
-    caffeine: z.number().nonnegative().optional(),
-
+    barCode: z.string().nullable().optional().transform(val => val === "" ? undefined : val),
     userId: z.string().cuid("Invalid userId format"),
+    ...nutritionFields,
 });
 
-export async function createFoodTemplate(unsafeArgs: createFoodTemplateArgs) {
+export async function createFoodTemplate(unsafeArgs: z.infer<typeof createFoodTemplateSchema> ) {
     const parsedArgs = createFoodTemplateSchema.safeParse(unsafeArgs);
 
     if (!parsedArgs.success) {
@@ -124,11 +119,61 @@ export async function createFoodTemplate(unsafeArgs: createFoodTemplateArgs) {
     }
 }
 
-interface GetFoodTemplateArgs {
-    userId: string
+// USDA-specific schema and logic
+export const usdaFoodTemplateSchema = z.object({
+    name: z.string().min(1, "Name is required"),
+    servingSize: z.number().positive("Serving size must be positive"),
+    servingUnit: z.string().min(1, "Serving unit is required"),
+    origin: z.literal("usda"),
+    originId: z.string(),
+    ...nutritionFields,
+});
+
+export type USDAFoodTemplateInput = z.infer<typeof usdaFoodTemplateSchema>;
+
+export async function createUSDAFoodTemplate(raw: unknown, userId: string) {
+    const parsed = usdaFoodTemplateSchema.safeParse(raw);
+
+    if (!parsed.success) {
+        logger.info("USDA food template creation failed due to invalid schema", { errors: parsed.error });
+        throw new Error("Validation failed: " + parsed.error.errors.map(e => e.message).join(", "));
+    }
+
+    const data: Prisma.FoodTemplateCreateInput = {
+        ...parsed.data,
+        user: {
+            connect: {
+                id: userId
+            }
+        }
+    };
+
+    try {
+        const existingFoodTemplate = await client.foodTemplate.findFirst({
+            where: {
+                originId: data.originId,
+                userId: userId,
+                deletedAt: null
+            }
+        });
+
+        if (existingFoodTemplate) {
+            return existingFoodTemplate;
+        }
+
+        return await client.foodTemplate.create({ data });
+    } catch (e) {
+        logger.error("Failed to create USDA food template", { exception: e });
+        throw e;
+    }
 }
 
-export async function getFoodTemplates(args: GetFoodTemplateArgs): Promise<FoodTemplate[]> {
+// Get user-owned food templates
+interface GetFoodTemplateArgs {
+    userId: string;
+}
+
+export async function getFoodTemplates(args: GetFoodTemplateArgs) {
     try {
         logger.info("get food templates", { args });
         return await client.foodTemplate.findMany({ where: { userId: args.userId } });

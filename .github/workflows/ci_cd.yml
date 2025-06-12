@@ -110,6 +110,7 @@ jobs:
           IMAGE_TAG=${{ github.sha }}
           REPO_OWNER=${{ github.repository_owner }}
           AUTH_TRUST_HOST=true
+          USDA_API_KEY=${{ vars.USDA_API_KEY }}
           EOF
 
       - name: "Pull latest Docker image by commit SHA tag"

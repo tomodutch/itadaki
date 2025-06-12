@@ -1,10 +1,10 @@
 "use server";
 
-import { getFoodTemplates, createFoodTemplate } from "@/db/queries/food";
-import { auth, ensureUserId } from "@/lib/auth";
+import { getFoodTemplates, createFoodTemplate, createUSDAFoodTemplate } from "@/db/queries/food";
+import { ensureUserId } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import logger from "@/lib/logger";
 import {getString, getNumber} from "./form-helpers";
+import { USDAFoodTemplate } from "../usda";
 
 export async function getFoodTemplatesForUser() {
     const userId = await ensureUserId();
@@ -14,12 +14,7 @@ export async function getFoodTemplatesForUser() {
 }
 
 export async function createFoodTemplateForUser(formData: FormData) {
-    const session = await auth();
-    if (!session?.user?.id) {
-        logger.info("Tried to create a food template while not authenticated. Redirecting to home");
-        return redirect("/");
-    }
-
+    const userId = await ensureUserId();
     const rawData = {
         name: getString(formData, "name"),
         brand: getString(formData, "brand"),
@@ -102,8 +97,13 @@ export async function createFoodTemplateForUser(formData: FormData) {
         selenium: rawData.selenium,
         alcohol: rawData.alcohol,
         caffeine: rawData.caffeine,
-        userId: session.user.id,
+        userId: userId,
     });
 
     redirect("/dashboard/food");
+}
+
+export async function createFoodTemplateFromUSDAForUser(usdaFoodTemplate: USDAFoodTemplate) {
+    const userId = await ensureUserId();
+    return await createUSDAFoodTemplate(usdaFoodTemplate, userId);
 }

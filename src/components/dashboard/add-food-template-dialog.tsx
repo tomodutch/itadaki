@@ -7,12 +7,13 @@ import { useDebouncedCallback } from "use-debounce";
 import { DialogHeader, DialogFooter } from "../ui/dialog";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import { USDAFoodTemplate } from "@/lib/usda";
 
 interface AddFoodTemplateDialogProps {
     open: boolean,
     setOpen: (state: boolean) => void,
-    foodTemplates: FoodTemplate[],
-    onSelectFoodTemplate: (selected: FoodTemplate) => void,
+    foodTemplates: (FoodTemplate | USDAFoodTemplate)[],
+    onSelectFoodTemplate: (selected: FoodTemplate | USDAFoodTemplate) => void,
     onSearch: (query: string, signal: AbortSignal) => Promise<void>
 }
 
@@ -39,7 +40,6 @@ export function AddFoodTemplateDialog(props: AddFoodTemplateDialogProps) {
 
     // Trigger the debounced search whenever searchQuery changes
     useEffect(() => {
-        if (searchQuery.trim() === "") return;
         debouncedSearch(searchQuery);
         // Cleanup on unmount or query change
         return () => {
@@ -55,7 +55,7 @@ export function AddFoodTemplateDialog(props: AddFoodTemplateDialogProps) {
                 if (!state) setSearchQuery("")
             }}
         >
-            <DialogContent className="sm:max-w-[600px] max-h-[70vh] overflow-auto">
+            <DialogContent className="sm:max-w-[80vw] max-h-[70vh] overflow-auto">
                 <DialogHeader>
                     <DialogTitle>Add to group</DialogTitle>
                 </DialogHeader>
@@ -80,9 +80,9 @@ export function AddFoodTemplateDialog(props: AddFoodTemplateDialogProps) {
 
                     <TabsContent value="foods" className="mt-4 text-sm text-muted-foreground">
                         {
-                            props.foodTemplates.map((t) => (
+                            props.foodTemplates.map((t, i) => (
                                 <Button
-                                    key={t.id}
+                                    key={i}
                                     variant="ghost"
                                     className="justify-between w-full"
                                     onClick={() => props.onSelectFoodTemplate(t)}>
