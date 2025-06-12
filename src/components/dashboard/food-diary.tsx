@@ -78,6 +78,11 @@ export function FoodDiary(props: FoodDiaryProps) {
     )
 }
 
+function formatNumber(n: number) {
+    return n.toLocaleString(undefined, {
+        maximumFractionDigits: 0
+    })
+}
 interface DailySummaryProps {
     summary: Summary
 }
@@ -89,19 +94,19 @@ function DailySummary(props: DailySummaryProps) {
                 <div className="grid grid-cols-4 text-center">
                     <div>
                         Total<br />
-                        <span className="text-foreground font-semibold">{props.summary.calories} kcal</span>
+                        <span className="text-foreground font-semibold">{formatNumber(props.summary.calories)} kcal</span>
                     </div>
                     <div>
                         Protein<br />
-                        <span className="text-foreground font-semibold">{props.summary.protein} g</span>
+                        <span className="text-foreground font-semibold">{formatNumber(props.summary.protein)} g</span>
                     </div>
                     <div>
                         Carbs<br />
-                        <span className="text-foreground font-semibold">{props.summary.carbs} g</span>
+                        <span className="text-foreground font-semibold">{formatNumber(props.summary.carbs)} g</span>
                     </div>
                     <div>
                         Fat<br />
-                        <span className="text-foreground font-semibold">{props.summary.fat} g</span>
+                        <span className="text-foreground font-semibold">{formatNumber(props.summary.fat)} g</span>
                     </div>
                 </div>
             </div>
@@ -153,10 +158,10 @@ function DiaryEntriesListGroup(props: DiaryEntriesListGroupProps) {
                 <div className="w-full">
                     <div className={gridLayoutClasses + " font-medium"}>
                         <span className="text-foreground">{props.title}</span>
-                        <span>{props.summary.calories} kcal</span>
-                        <span className="hidden sm:block">{props.summary.protein} protein</span>
-                        <span className="hidden sm:block">{props.summary.carbs} carbs</span>
-                        <span className="hidden sm:block">{props.summary.fat} fat</span>
+                        <span>{formatNumber(props.summary.calories)} kcal</span>
+                        <span className="hidden sm:block">{formatNumber(props.summary.protein)} protein</span>
+                        <span className="hidden sm:block">{formatNumber(props.summary.carbs)} carbs</span>
+                        <span className="hidden sm:block">{formatNumber(props.summary.fat)} fat</span>
                     </div>
                 </div>
             </AccordionTrigger>
@@ -165,10 +170,10 @@ function DiaryEntriesListGroup(props: DiaryEntriesListGroupProps) {
                     props.diaryEntries.map((e) => (
                         <div className={gridLayoutClasses} key={e.id}>
                             <span className="text-foreground">{e.name}</span>
-                            <span>{e.calories} kcal</span>
-                            <span className="hidden sm:block">{e.protein || 0} protein</span>
-                            <span className="hidden sm:block">{e.carbs || 0} carbs</span>
-                            <span className="hidden sm:block">{e.fat || 0} fat</span>
+                            <span>{formatNumber(e.calories)} kcal</span>
+                            <span className="hidden sm:block">{formatNumber(e.protein || 0)} protein</span>
+                            <span className="hidden sm:block">{formatNumber(e.carbs || 0)} carbs</span>
+                            <span className="hidden sm:block">{formatNumber(e.fat || 0)} fat</span>
                         </div>
                     ))
                 }

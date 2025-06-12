@@ -47,6 +47,24 @@ export const WithEntries: Story = {
     }
 };
 
+export const WithFractions: Story = {
+    args: {
+        categorizedDiaryEntries: [
+            factory.createCategory({
+                key: "Breakfast", diaryEntries: Array.from({length: 8}).map(() => factory.createDiaryEntry({}))
+            }),
+            factory.createCategory({ key: "Lunch", diaryEntries: Array.from({length: 6}).map(() => factory.createDiaryEntry({
+                calories: 0.00000001,
+                protein: 0.2,
+                fat: 0.99,
+                carbs: 20.1111111
+            })) }),
+            factory.createCategory({ key: "Dinner", diaryEntries: Array.from({length: 4}).map(() => factory.createDiaryEntry({})) }),
+            factory.createCategory({ key: "Snack", diaryEntries: Array.from({length: 3}).map(() => factory.createDiaryEntry({})) }),
+        ],
+    }
+};
+
 export const IsLoading: Story = {
     args: {
         isLoading: true
