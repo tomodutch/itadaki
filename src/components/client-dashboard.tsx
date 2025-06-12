@@ -12,6 +12,8 @@ import { Plus } from "lucide-react";
 import { AddFoodTemplateDialog } from "./dashboard/add-food-template-dialog";
 import { FoodTemplateDetailsDialog, OnAddDiaryItem } from "./dashboard/food-template-details-dialog";
 import { USDAFoodTemplate } from "@/lib/usda";
+import { BarcodeScanDialog } from "./dashboard/barcode-scan-dialog";
+import { getByCode, OFFFoodTemplate } from "@/lib/open-food-facts";
 
 interface ClientDashboardProps {
     foodTemplates: FoodTemplate[],
@@ -20,13 +22,14 @@ interface ClientDashboardProps {
 
 export default function ClientDashboard({ foodTemplates, diaryEntries: initialEntries }: ClientDashboardProps) {
     const [date, setDate] = useUrlDate();
-    const [searchResults, setSearchResults] = useState<(USDAFoodTemplate | FoodTemplate)[]>([]);
+    const [searchResults, setSearchResults] = useState<(USDAFoodTemplate | OFFFoodTemplate | FoodTemplate)[]>([]);
     const [entries, setEntries] = useState(initialEntries);
     const [isDiaryLoading, setIsDiaryLoading] = useState(false);
     const [open, setOpen] = useState(false)
-    const [selectedTemplate, setSelectedTemplate] = useState<FoodTemplate | USDAFoodTemplate | null>(null);
+    const [selectedTemplate, setSelectedTemplate] = useState<FoodTemplate | OFFFoodTemplate | USDAFoodTemplate | null>(null);
     const [subDialogOpen, setSubDialogOpen] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
+    const [barcodeScanning, setBarcodeScanning] = useState(false);
 
     const fetchEntriesForDate = async (newDate: Date) => {
         const updated = await getDiaryCategoriesAndEntries(newDate);
@@ -87,6 +90,9 @@ export default function ClientDashboard({ foodTemplates, diaryEntries: initialEn
                     setSearchResults([]);
                     setOpen(nextState);
                 }}
+                onBarcodeClick={() => {
+                    setBarcodeScanning(true);
+                }}
                 foodTemplates={isSearching ? searchResults : foodTemplates}
                 onSearch={async (query, signal) => {
                     if (query.trim().length === 0) {
@@ -122,6 +128,22 @@ export default function ClientDashboard({ foodTemplates, diaryEntries: initialEn
                     }}
                 />
             )}
+
+            {
+                barcodeScanning && (
+                    <BarcodeScanDialog open={barcodeScanning} setOpen={function (state: boolean): void {
+                        setBarcodeScanning(state);
+                    }} onResult={async function (code: string) {
+                        const resp = await getByCode(code);
+                        if (resp) {
+                            setBarcodeScanning(false);
+                            setSelectedTemplate(resp);
+                            setSubDialogOpen(true);
+                        }
+                    }} />
+                )
+            }
+
             <Button
                 className="fixed bottom-6 right-6 rounded-full h-14 w-14 p-0 shadow-lg"
                 size="icon"

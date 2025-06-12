@@ -8,13 +8,15 @@ import { DialogHeader, DialogFooter } from "../ui/dialog";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { USDAFoodTemplate } from "@/lib/usda";
+import { OFFFoodTemplate } from "@/lib/open-food-facts";
 
 interface AddFoodTemplateDialogProps {
     open: boolean,
     setOpen: (state: boolean) => void,
-    foodTemplates: (FoodTemplate | USDAFoodTemplate)[],
-    onSelectFoodTemplate: (selected: FoodTemplate | USDAFoodTemplate) => void,
+    foodTemplates: (FoodTemplate | OFFFoodTemplate | USDAFoodTemplate)[],
+    onSelectFoodTemplate: (selected: FoodTemplate | OFFFoodTemplate | USDAFoodTemplate) => void,
     onSearch: (query: string, signal: AbortSignal) => Promise<void>
+    onBarcodeClick: () => void
 }
 
 export function AddFoodTemplateDialog(props: AddFoodTemplateDialogProps) {
@@ -68,7 +70,7 @@ export function AddFoodTemplateDialog(props: AddFoodTemplateDialogProps) {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
-                    <Barcode className="absolute right-3 top-3 h-4 w-4 text-muted-foreground cursor-pointer" />
+                    <Barcode className="absolute right-3 top-3 h-4 w-4 text-muted-foreground cursor-pointer" onClick={props.onBarcodeClick} />
                 </div>
 
                 <Tabs value={searchTab} onValueChange={setSearchTab} className="pt-4">

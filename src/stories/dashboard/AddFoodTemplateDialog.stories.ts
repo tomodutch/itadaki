@@ -14,7 +14,8 @@ const meta = {
         setOpen: fn(),
         foodTemplates: Array.from({length: 10}).map(() => factory.createFoodTemplate({})),
         onSelectFoodTemplate: fn(),
-        onSearch: fn()
+        onSearch: fn(),
+        onBarcodeClick: fn()
     }
 } satisfies Meta<typeof AddFoodTemplateDialog>;
 
