@@ -50,11 +50,10 @@ export function FoodTemplateDetailsDialog(props: FoodTemplateDetailsDialogProps)
 
     return (
         <Dialog open={subDialogOpen} onOpenChange={setSubDialogOpen}>
-            <DialogContent className="sm:max-w-[80vw] max-h-[70vh]">
+            <DialogContent className="w-full h-full sm:max-w-full sm:max-h-full lg:max-w-[60vw] lg:max-h-[80vh] overflow-auto">
                 <DialogHeader>
                     <DialogTitle>Add {name}</DialogTitle>
                 </DialogHeader>
-
 
                 <Form {...diaryEntryForm}>
                     <form onSubmit={diaryEntryForm.handleSubmit(onSubmit)}>

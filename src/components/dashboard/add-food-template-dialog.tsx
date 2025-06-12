@@ -55,7 +55,7 @@ export function AddFoodTemplateDialog(props: AddFoodTemplateDialogProps) {
                 if (!state) setSearchQuery("")
             }}
         >
-            <DialogContent className="sm:max-w-[80vw] max-h-[70vh] overflow-auto">
+            <DialogContent className="w-full h-full sm:max-w-full sm:max-h-full lg:max-w-[60vw] lg:max-h-[80vh] overflow-auto">
                 <DialogHeader>
                     <DialogTitle>Add to group</DialogTitle>
                 </DialogHeader>
@@ -78,7 +78,10 @@ export function AddFoodTemplateDialog(props: AddFoodTemplateDialogProps) {
                         <TabsTrigger value="recipes">Recipes</TabsTrigger>
                     </TabsList>
 
-                    <TabsContent value="foods" className="mt-4 text-sm text-muted-foreground">
+                    <TabsContent
+                        value="foods"
+                        className="mt-4 text-sm max-h-80 text-muted-foreground lg:max-h-60 overflow-y-auto"
+                    >
                         {
                             props.foodTemplates.map((t, i) => (
                                 <Button
