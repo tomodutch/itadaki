@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { FoodDiary } from "@/components/dashboard/food-diary";
-import { fn } from 'storybook/test';
 import * as factory from "../factory";
 
 const meta = {
@@ -23,7 +22,6 @@ const meta = {
             factory.createCategory({ key: "Dinner" }),
             factory.createCategory({ key: "Snack" }),
         ],
-        onAdd: fn(),
         isLoading: false
     }
 } satisfies Meta<typeof FoodDiary>;

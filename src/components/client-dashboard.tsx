@@ -5,7 +5,11 @@ import { useUrlDate } from "./dashboard/use-url-date";
 import { DatePicker } from "./dashboard/date-picker";
 import { useState } from "react";
 import { createDiaryEntryForUser, getDiaryCategoriesAndEntries } from "@/lib/api/diary";
-import { FoodDiary, OnAddDiaryItem } from "./dashboard/food-diary";
+import { FoodDiary } from "./dashboard/food-diary";
+import { Button } from "./ui/button";
+import { Plus } from "lucide-react";
+import { AddFoodTemplateDialog } from "./dashboard/add-food-template-dialog";
+import { FoodTemplateDetailsDialog, OnAddDiaryItem } from "./dashboard/food-template-details-dialog";
 
 interface ClientDashboardProps {
     foodTemplates: FoodTemplate[],
@@ -16,6 +20,9 @@ export default function ClientDashboard({ foodTemplates, diaryEntries: initialEn
     const [date, setDate] = useUrlDate();
     const [entries, setEntries] = useState(initialEntries);
     const [isDiaryLoading, setIsDiaryLoading] = useState(false);
+    const [open, setOpen] = useState(false)
+    const [selectedTemplate, setSelectedTemplate] = useState<FoodTemplate | null>(null);
+    const [subDialogOpen, setSubDialogOpen] = useState(false);
 
     const fetchEntriesForDate = async (newDate: Date) => {
         const updated = await getDiaryCategoriesAndEntries(newDate);
@@ -59,8 +66,40 @@ export default function ClientDashboard({ foodTemplates, diaryEntries: initialEn
                 isLoading={isDiaryLoading}
                 foodTemplates={foodTemplates}
                 categorizedDiaryEntries={entries}
-                onAdd={onAdd}
             />
+
+            <AddFoodTemplateDialog
+                open={open}
+                setOpen={setOpen}
+                foodTemplates={foodTemplates}
+                onSearch={() => { return Promise.resolve() }}
+                onSelectFoodTemplate={(selected) => {
+                    setSelectedTemplate(selected);
+                    setSubDialogOpen(true);
+                }} />
+
+            {selectedTemplate && (
+                <FoodTemplateDetailsDialog
+                    open={subDialogOpen}
+                    setOpen={setSubDialogOpen}
+                    selectedTemplate={selectedTemplate}
+                    diaryCategories={entries}
+                    onAdd={async (i) => {
+                        await onAdd(i);
+                        setSubDialogOpen(false);
+                        setSelectedTemplate(null);
+                    }}
+                />
+            )}
+            <Button
+                className="fixed bottom-6 right-6 rounded-full h-14 w-14 p-0 shadow-lg"
+                size="icon"
+                onClick={() => {
+                    setOpen(true);
+                }}
+            >
+                <Plus />
+            </Button>
         </div>
     );
 }
