@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { FoodDiary } from "@/components/dashboard/food-diary";
 import * as factory from "../factory";
+import { fn } from 'storybook/test';
 
 const meta = {
     title: 'Dashboard/FoodDiary',
@@ -9,6 +10,7 @@ const meta = {
         layout: 'fullscreen',
     },
     args: {
+        onAdd: fn(),
         foodTemplates: [
             factory.createFoodTemplate({ name: "chicken" }),
             factory.createFoodTemplate({ name: "browny" }),
