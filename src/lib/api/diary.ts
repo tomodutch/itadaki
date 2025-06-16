@@ -16,8 +16,6 @@ export async function getDiaryEntriesForUser(args: GetDiaryEntryForUserArgs) {
 
 interface CreateDiaryEntryForUserArgs {
     date: Date,
-    servingSize: number,
-    servings: number,
     categoryId: string,
     foodTemplateId: string,
 };
@@ -27,8 +25,6 @@ export async function createDiaryEntryForUser(args: CreateDiaryEntryForUserArgs)
     return await createDiaryEntry({
         date: args.date,
         userId: userId,
-        servingSize: args.servingSize,
-        servings: args.servings,
         categoryId: args.categoryId,
         foodTemplateId: args.foodTemplateId
     });

@@ -6,8 +6,6 @@ import { CategoryWithEntries } from "../types";
 
 interface createDiaryEntryArgs extends z.infer<typeof createDiaryEntrySchema> {
     date: Date,
-    servingSize: number,
-    servings: number,
     categoryId: string,
     foodTemplateId: string,
     userId: string,
@@ -15,8 +13,6 @@ interface createDiaryEntryArgs extends z.infer<typeof createDiaryEntrySchema> {
 
 export const createDiaryEntrySchema = z.object({
     date: z.date(),
-    servingSize: z.number().positive("Serving size must be positive"),
-    servings: z.number().positive("Serving size must be positive"),
     categoryId: z.string(),
     foodTemplateId: z.string().cuid("Invalid foodTemplateId format"),
     userId: z.string().cuid("Invalid userId format"),
@@ -77,8 +73,6 @@ export async function createDiaryEntry(unsafeArgs: createDiaryEntryArgs) {
         throw new Error(msg);
     }
 
-    const factor = parsedArgs.data.servings * parsedArgs.data.servingSize;
-
     const nutrientFields = [
         "protein",
         "carbs",
@@ -116,19 +110,11 @@ export async function createDiaryEntry(unsafeArgs: createDiaryEntryArgs) {
     ] as const;
 
     const scaledNutrition: Partial<Record<typeof nutrientFields[number], number>> = {};
-
-    for (const key of nutrientFields) {
-        const value = foodTemplate[key];
-        if (typeof value === "number") {
-            scaledNutrition[key] = value * factor;
-        }
-    }
-
     const data: Prisma.DiaryEntryCreateInput = {
         name: foodTemplate.name,
-        servingSize: parsedArgs.data.servingSize,
+        servingSize: foodTemplate.servingSize,
         servingUnit: foodTemplate.servingUnit,
-        servings: parsedArgs.data.servings,
+        servings: 1,
         date: parsedArgs.data.date,
         category: {
             connect: { id: parsedArgs.data.categoryId }
@@ -139,7 +125,7 @@ export async function createDiaryEntry(unsafeArgs: createDiaryEntryArgs) {
         user: {
             connect: { id: parsedArgs.data.userId }
         },
-        calories: foodTemplate.calories * factor,
+        calories: foodTemplate.calories,
         ...scaledNutrition,
     };
 
