@@ -34,8 +34,6 @@ export default function ClientDashboard({ foodTemplates, diaryEntries: initialEn
         try {
             await createDiaryEntryForUser({
                 date,
-                servings: 1,
-                servingSize: 1,
                 foodTemplateId: foodTemplate.id,
                 categoryId: categoryId,
             });
